@@ -35,8 +35,10 @@ def startup() -> None:
         page_icon="🗳️",
         layout="wide",
         menu_items={
-            "Get help": "https://github.com/LukeP81/Proportional-Representation",
-            "Report a Bug": "https://github.com/LukeP81/Proportional-Representation",
+            "Get help":
+                "https://github.com/LukeP81/Proportional-Representation",
+            "Report a Bug":
+                "https://github.com/LukeP81/Proportional-Representation",
             "About": """
             This Streamlit app allows you to explore and compare election results
             under First-past-the-post and Proportional representation voting
@@ -44,7 +46,8 @@ def startup() -> None:
             analyze ruling governments based on user-configurable parameters.
             - *Use the sidebar to select the election and set configuration
             parameters.*\n
-            Author: Luke Peart, lukepeart81@gmail.com, [Github](https://github.com/LukeP81)
+            Author: Luke Peart, lukepeart81@gmail.com, 
+            [Github](https://github.com/LukeP81)
             """
         }
     )
