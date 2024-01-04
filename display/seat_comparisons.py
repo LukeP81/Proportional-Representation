@@ -1,6 +1,6 @@
 import streamlit as st
 
-from election_base import Election
+from elections.election_base import Election
 
 
 def _compare_voting_systems_seat_difference(

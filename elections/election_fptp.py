@@ -3,10 +3,10 @@ from typing import Dict
 import numpy as np
 
 from database_retriever import get_vote_data
-from election_base import Election
+from elections.election_base import Election
 
 
-class FPTP(Election):
+class FirstPastThePost(Election):
     def __init__(
             self,
             election_name: str,

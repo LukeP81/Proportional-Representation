@@ -5,9 +5,9 @@ import streamlit as st
 from database_retriever import get_table_names
 
 
-def configure_page() -> None:
+def startup() -> None:
     """
-    Configures the Streamlit page options.
+    Sets everything that must be set at the start of running.
     """
 
     st.set_page_config(
@@ -15,6 +15,12 @@ def configure_page() -> None:
         page_icon="🗳️",
         layout="wide",  # todo: Implement additional configuration for the menu
     )
+
+    st.session_state["elections"] = get_table_names()
+    if "elections" not in st.session_state:
+        st.session_state["elections"] = get_table_names()
+    if "current_election" not in st.session_state:
+        st.session_state["current_election"] = st.session_state["elections"][-1]
 
 
 def improve_election_readability(
@@ -42,14 +48,18 @@ def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
     :rtype: Dict[str, Union[str, bool, int]]
     """
 
-    years = get_table_names()
-    election_year = st.sidebar.select_slider(
-        label="Election Year",
-        options=years,
-        value=years[-1],
+    def on_election_slider_change():
+        chosen_election = st.session_state["sidebar_election_name"]
+        st.session_state["current_election"] = chosen_election
+
+    election_name = st.sidebar.select_slider(
+        label="Election",
+        options=st.session_state["elections"],
+        value=st.session_state["current_election"],
         format_func=improve_election_readability,
-        key="sidebar_election_year",
-        help="Use the slider to select the election year"
+        key="sidebar_election_name",
+        help="Use the slider to select the election",
+        on_change=on_election_slider_change
     )
 
     pr_by_region_options = {"By Region": True, "Entire Electorate": False, }
@@ -70,7 +80,7 @@ def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
     )
 
     tab_layout = st.sidebar.toggle(
-        label="Tab layout",
+        label="Tab Layout",
         value=False,
         key="sidebar_tab_layout",
         help="Displays the page in a tab layout if enabled"
@@ -85,7 +95,7 @@ def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
     )
 
     return {
-        "election_year": election_year,
+        "election_name": election_name,
         "pr_by_region": pr_by_region,
         "ignore_other_pr": ignore_other_pr,
         "tab_layout": tab_layout,
@@ -93,17 +103,57 @@ def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
     }
 
 
+def change_current_election(election_offset: int = 0) -> None:
+    """
+    Alters the current election in the session state based on the provided
+    election offset.
+
+    :param election_offset: An integer representing the change in index to
+        navigate to different elections. Default is 0 (no alteration).
+    :type election_offset: int
+    """
+
+    elections = st.session_state["elections"]
+    current_election = st.session_state["current_election"]
+    next_election = elections[elections.index(current_election) + election_offset]
+    st.session_state["current_election"] = next_election
+
+
+def next_button():
+    """
+    Displays a button to navigate to the previous election if available.
+    """
+
+    if st.session_state["current_election"] != st.session_state["elections"][-1]:
+        st.button(label="Next Election",
+                  key="button_next_election",
+                  on_click=change_current_election,
+                  args=(+1,))
+
+
+def previous_button() -> None:
+    """
+    Displays a button to navigate to the previous election if available.
+    """
+
+    if st.session_state["current_election"] != st.session_state["elections"][0]:
+        st.button(label="Previous Election",
+                  key="button_previous_election",
+                  on_click=change_current_election,
+                  args=(-1,))
+
+
 def display_title(
-        election_year: str
+        election_name: str
 ) -> None:
     """
     Display the election title at the center of the page.
 
-    :param election_year: Selected election year.
-    :type election_year: str
+    :param election_name: Selected election year.
+    :type election_name: str
     """
 
-    title = f"{improve_election_readability(election_year)} Election "
+    title = f"{improve_election_readability(election_name)} Election "
     title_html = f"""
         <p style='text-align: center;
                 font-size: 48px;
@@ -121,7 +171,15 @@ def display_initial_page() -> Dict[str, Union[str, bool, int]]:
     :rtype: Dict[str, Union[str, bool, int]]
     """
 
-    configure_page()
+    startup()
     sidebar_options = setup_sidebar_options()
-    display_title(election_year=sidebar_options["election_year"])
+
+    left_column, middle_column, right_column = st.columns([1, 5, 1])
+    with left_column:
+        previous_button()
+    with right_column:
+        next_button()
+    with middle_column:
+        display_title(election_name=sidebar_options["election_name"])
+
     return sidebar_options

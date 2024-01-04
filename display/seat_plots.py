@@ -5,7 +5,7 @@ from plotly import graph_objects as go
 import numpy as np
 import streamlit as st
 
-from election_base import Election
+from elections.election_base import Election
 
 
 def party_dot(

@@ -1,6 +1,6 @@
 import streamlit as st
 
-from election_base import Election
+from elections.election_base import Election
 
 
 def display_ruling_government(election: Election) -> None:

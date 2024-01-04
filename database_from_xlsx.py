@@ -58,11 +58,11 @@ def valid_sheet(
 
     try:
         if int(sheet_name) < MIN_ELECTION_YEAR:
-            return True
+            return False
     except ValueError:
-        if sheet_name in ["1974F", "1974O"]:
-            return True
-    return False
+        if sheet_name not in ["1974F", "1974O"]:
+            return False
+    return True
 
 
 def create_database(

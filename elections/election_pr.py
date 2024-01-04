@@ -4,11 +4,11 @@ import heapq
 
 import numpy as np
 
-from election_base import Election
+from elections.election_base import Election
 from database_retriever import get_vote_data, get_regions
 
 
-class PR(Election):
+class ProportionalRepresentation(Election):
     def __init__(
             self,
             election_name: str,
