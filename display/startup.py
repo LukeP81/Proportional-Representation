@@ -39,14 +39,12 @@ def startup() -> None:
             "Report a Bug": "https://github.com/LukeP81/Proportional-Representation",
             "About": """
             This Streamlit app allows you to explore and compare election results
-            under different voting systems. You can visualize seat plots, compare
-            seats gained/lost, and analyze ruling governments based on
-            user-configurable parameters.
+            under First-past-the-post and Proportional representation voting
+            systems. You can visualize seat plots, compare seats gained/lost, and
+            analyze ruling governments based on user-configurable parameters.
             - *Use the sidebar to select the election and set configuration
-            parameters.*
-            Author: Luke Peart
-            Email: lukepeart81@gmail.com
-            Github: https://github.com/LukeP81
+            parameters.*\n
+            Author: Luke Peart, lukepeart81@gmail.com, [Github](https://github.com/LukeP81)
             """
         }
     )
