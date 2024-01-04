@@ -7,39 +7,53 @@ import pandas as pd
 MIN_ELECTION_YEAR = 1955
 
 
-def clean_and_transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def process_election_data(
+        election_data: pd.DataFrame
+) -> pd.DataFrame:
     """
     Clean and transform the given DataFrame
 
-    :param df: The input DataFrame to be cleaned and transformed
-    :type df: pandas.DataFrame
+    :param election_data: The input DataFrame to be cleaned and transformed
+    :type election_data: pandas.DataFrame
     :return: Cleaned and transformed DataFrame
     :rtype: pandas.DataFrame
     """
 
-    # remove blank rows
-    df = df.dropna(axis=1, how="all").copy()
+    election_data = election_data.dropna(axis=1, how="all").copy()
 
-    # give correct formatting to parties (the Excel file has merged cells)
-    for i, value in enumerate(df.iloc[2, :]):
-        if str(value).strip() == "Votes":
-            df.iloc[2, i] = f"Votes-{df.iloc[1, i]}"
-        elif str(value).strip() == "Vote share":
-            df.iloc[2, i] = f"Vote share-{df.iloc[1, i - 1]}"
+    # deal with merged cells
+    if election_data.iloc[2, 0] != "id":
+        election_data.iloc[2, 0] = "id"
+    for i, column_names in enumerate(election_data.iloc[2, :]):
+        clean_name = str(column_names).strip()
+        if clean_name not in ["Votes", "Vote share"]:
+            continue
+        party_name = election_data.iloc[
+            1, i if clean_name == "Votes" else i - 1]
+        election_data.iloc[2, i] = f"{clean_name}-{party_name}"
 
-    # 1983 onwards has a merged cell for the id
-    if df.iloc[2, 0] != "id":
-        df.iloc[2, 0] = "id"
+    election_data.columns = election_data.iloc[2]
+    election_data = election_data.iloc[3:, :].dropna(
+        subset=["id"]
+    ).reset_index(
+        drop=True
+    ).set_index(keys="id")
 
-    # set the column names and remove redundant rows
-    df.columns = df.iloc[2]
-    df = df.iloc[3:, :].dropna(subset=["id"]).reset_index(drop=True).set_index(
-        "id")
-
-    return df
+    return election_data
 
 
-def valid_sheet(sheet_name):
+def valid_sheet(
+        sheet_name: str
+) -> bool:
+    """
+    Check if a given sheet name is valid based on specific criteria.
+
+    :param sheet_name: The name of the sheet to be validated.
+    :type sheet_name: str
+    :return: True if the sheet is valid, False otherwise.
+    :rtype: bool
+    """
+
     try:
         if int(sheet_name) < MIN_ELECTION_YEAR:
             return True
@@ -49,9 +63,10 @@ def valid_sheet(sheet_name):
     return False
 
 
-def create_database(excel_file_path: str,
-                    database_name: str = "output.db"
-                    ) -> None:
+def create_database(
+        excel_file_path: str,
+        database_name: str = "output.db"
+) -> None:
     """
     Create a SQLite database from an Excel file
 
@@ -63,22 +78,30 @@ def create_database(excel_file_path: str,
     :rtype: None
     """
 
-    xls = pd.ExcelFile(excel_file_path)
+    xls = pd.ExcelFile(path_or_buffer=excel_file_path)
 
-    with sqlite3.connect(database_name) as conn:
-        for sheet_name in tqdm(xls.sheet_names):
+    with sqlite3.connect(database=database_name) as conn:
+        for sheet_name in tqdm(iterable=xls.sheet_names):
             if not valid_sheet(sheet_name):
                 continue
 
             try:
-                df = pd.read_excel(xls, sheet_name)
-                df = clean_and_transform_dataframe(df)
-                df.to_sql(sheet_name, conn, index=False, if_exists="replace")
+                election_data = pd.read_excel(io=xls,
+                                              sheet_name=sheet_name)
+                election_data = process_election_data(election_data=election_data)
+                election_data.to_sql(name=sheet_name,
+                                     con=conn,
+                                     index=False,
+                                     if_exists="replace")
             except Exception as e:
                 print(f"Error processing sheet {sheet_name}: {e}")
 
 
-def main():
+def main() -> None:
+    """
+    Creates a database (.db file) from an excel file containing election data.
+    """
+
     excel_file_path = "1918-2019election_results_by_pcon.xlsx"
     database_name = "elections.db"
 

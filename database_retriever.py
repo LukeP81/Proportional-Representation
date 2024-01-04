@@ -1,12 +1,21 @@
 import sqlite3
 from contextlib import contextmanager
+from typing import List, Optional, Tuple
+
 import numpy as np
 import streamlit as st
 
 
 @contextmanager
 def connect_to_database():
-    conn = sqlite3.connect("elections.db")
+    """
+    Context manager to connect to the SQLite database.
+
+    :yield: SQLite cursor
+    :rtype: sqlite3.Cursor
+    """
+
+    conn = sqlite3.connect(database="elections.db")
     cursor = conn.cursor()
     try:
         yield cursor
@@ -16,7 +25,14 @@ def connect_to_database():
 
 
 @st.cache_data
-def get_table_names():
+def get_table_names() -> List[str]:
+    """
+    Retrieves the names of all tables present in the SQLite database.
+
+    :return: List of table names
+    :rtype: List[str]
+    """
+
     with connect_to_database() as cursor:
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         table_names = cursor.fetchall()
@@ -26,16 +42,43 @@ def get_table_names():
 
 
 @st.cache_data
-def get_regions(table_name):
+def get_regions(table_name: str) -> List[str]:
+    """
+    Retrieves distinct country/region names from a specified table in the
+    SQLite database.
+
+    :param table_name: Name of the table
+    :type table_name: str
+    :return: List of distinct country/region names
+    :rtype: List[str]
+    """
+
     with connect_to_database() as cursor:
         cursor.execute(f"SELECT DISTINCT [Country/Region] FROM [{table_name}];")
         return [region[0] for region in cursor.fetchall()]
 
 
 @st.cache_data
-def get_vote_data(table_name, region=None, ignore_other=False):
-    with connect_to_database() as cursor:
+def get_vote_data(
+        table_name: str,
+        region: Optional[str] = None,
+        ignore_other: bool = False
+) -> Tuple[List[str], np.ndarray]:
+    """
+    Retrieves vote data from a specified table in the SQLite database.
 
+    :param table_name: Name of the table
+    :type table_name: str
+    :param region: Name of the country/region. If None,
+                   retrieves data for all regions.
+    :type region: Optional[str]
+    :param ignore_other: Whether to ignore the 'Votes-Other' column in the result.
+    :type ignore_other: bool
+    :return: Tuple containing a list of party names and a NumPy array of vote data
+    :rtype: Tuple[List[str], np.ndarray]
+    """
+
+    with connect_to_database() as cursor:
         cursor.execute(f"PRAGMA table_info([{table_name}]);")
         columns = [f"[{column[1]}]" for column in cursor.fetchall() if
                    column[1].startswith('Votes-')]

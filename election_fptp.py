@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np
 
 from election_base import Election
@@ -5,13 +7,32 @@ from database_retriever import get_vote_data
 
 
 class FPTP(Election):
-    def __init__(self, year, maximum_coalition_size):
-        super().__init__(year, maximum_coalition_size)
+    def __init__(
+            self,
+            election_name: str,
+            maximum_coalition_size: int
+    ):
+        """
+        :param election_name: The name or year of the election.
+        :type election_name: str
+        :param maximum_coalition_size: The maximum number of parties in a coalition.
+        :type maximum_coalition_size: int
+        """
+        super().__init__(election_name, maximum_coalition_size)
 
-    def _calculate_results(self):
-        parties, votes = get_vote_data(self.year)
-        max_values = votes.max(axis=1, initial=0)
-        max_columns = np.array(votes == max_values[:, np.newaxis])
-        column_counts = dict(
-            zip(parties, max_columns.sum(axis=0)))
-        self._results = self.sort_results(column_counts)
+    @property
+    def election_type(self) -> str:
+        """
+        Property representing the type of the election.
+        """
+        return "First Past The Post"
+
+    def _calculate_results(self) -> Dict[str, int]:
+        """
+        Calculates the FPTP election results based on the specified parameters.
+        """
+        parties, votes = get_vote_data(table_name=self.election_name)
+        max_vote_counts = votes.max(axis=1, initial=0)
+        winning_party_flags = np.array(votes == max_vote_counts[:, np.newaxis])
+        parties_seats = dict(zip(parties, winning_party_flags.sum(axis=0)))
+        return self.sort_results(parties_seats)
