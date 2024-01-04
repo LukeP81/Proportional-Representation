@@ -28,7 +28,7 @@ class FirstPastThePost(Election):
     - election_type (str): Property representing the type of the election.
 
     Methods:
-    - _calculate_results(): Calculates the FPTP election results.
+    - _calculate_results: Calculates the FPTP election results.
     """
 
     def __init__(

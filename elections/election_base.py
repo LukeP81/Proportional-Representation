@@ -33,17 +33,17 @@ class Election(ABC):
       on election results.
 
     Methods:
-    - calculate_results(): Calculates the election results and marks
+    - calculate_results: Calculates the election results and marks
       them as calculated.
-    - _calculate_results(): Abstract private method to be implemented by
+    - _calculate_results: Abstract private method to be implemented by
       subclasses for calculating election results.
-    - calculate_coalitions(): Calculates the valid coalitions based on election
+    - calculate_coalitions: Calculates the valid coalitions based on election
       results and marks them as calculated.
-    - _calculate_coalitions(): Private method to calculate valid coalitions
+    - _calculate_coalitions: Private method to calculate valid coalitions
       based on election results.
-    - _find_valid_coalitions_recursive(): Recursive helper method to find valid
+    - _find_valid_coalitions_recursive: Recursive helper method to find valid
       coalitions from election results.
-    - sort_results(results: dict): Static method to sort election results in
+    - sort_results: Static method to sort election results in
       a specific order.
     """
 

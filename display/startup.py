@@ -46,8 +46,8 @@ def startup() -> None:
             analyze ruling governments based on user-configurable parameters.
             - *Use the sidebar to select the election and set configuration
             parameters.*\n
-            Author: Luke Peart, lukepeart81@gmail.com, 
-            [Github](https://github.com/LukeP81)
+            Author: Luke Peart, lukepeart81@gmail.com,
+             [Github](https://github.com/LukeP81)
             """
         }
     )

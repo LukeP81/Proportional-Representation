@@ -11,8 +11,6 @@ votes per seat for each consecutive seat awarded, for more detail see:
 https://en.wikipedia.org/wiki/D%27Hondt_method
 """
 
-
-
 from collections import Counter
 from typing import Dict, List
 import heapq
@@ -37,10 +35,12 @@ class ProportionalRepresentation(Election):
     - election_type (str): Property representing the type of the election.
 
     Methods:
-    - _calculate_results(): Calculates the PR election results based on the specified parameters.
-    - _compute_seats_by_pr(parties: List[str], votes: np.ndarray) -> Dict[str, int]:
-      Computes the number of seats each party obtains in a PR election using the D'Hondt method.
+    - _calculate_results: Calculates the PR election results based on the
+        specified parameters.
+    - _compute_seats_by_pr: Computes the number of seats each party obtains in a
+        PR election using the D'Hondt method.
     """
+
     def __init__(
             self,
             election_name: str,
