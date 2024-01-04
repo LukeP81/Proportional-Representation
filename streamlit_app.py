@@ -1,3 +1,35 @@
+"""
+Streamlit App Module
+
+This script defines a Streamlit web application for visualizing and comparing
+election results under different voting systems.
+
+Modules:
+- `display.ruling_governments`: Functions to display comparisons of ruling
+    governments between different election systems.
+- `display.seat_comparisons`: Functions to display comparisons of seats
+    gained/lost between different election systems.
+- `display.seat_plots`: Functions to display seat plots for different election
+    systems.
+- `display.startup`: Functions for displaying the initial page and obtaining user
+    input.
+
+Classes:
+- `elections.election_fptp.FirstPastThePost`: Class for conducting
+    First-Past-The-Post (FPTP) elections.
+- `elections.election_pr.ProportionalRepresentation`: Class for conducting
+    Proportional Representation (PR) elections.
+
+Main Execution:
+1. Initializes the Streamlit app with the required modules.
+2. Obtains user selection for election and configuration parameters.
+3. Conducts FPTP and PR elections based on parameters.
+4. Displays election results and comparisons using Streamlit components.
+
+Usage:
+Run the script using the Streamlit command: `streamlit run streamlit_app.py`
+"""
+
 import streamlit as st
 
 from display.ruling_governments import display_governments_comparison

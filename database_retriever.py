@@ -1,3 +1,18 @@
+"""
+Database Retriever Module
+
+This module provides functions for connecting to an SQLite database, retrieving
+information about tables, and obtaining specific data for analysis.
+
+The module includes the following functions:
+- connect_to_database: Context manager for establishing a connection to the
+  SQLite database.
+- get_table_names: Retrieves the names of all tables in the connected database.
+- get_regions: Retrieves distinct country/region names from a specified table.
+- get_vote_data: Retrieves vote data from a specified table, optionally filtered
+  by country/region and ignoring the 'Votes-Other' column.
+"""
+
 from contextlib import contextmanager
 from typing import List, Optional, Tuple
 import sqlite3

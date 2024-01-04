@@ -1,3 +1,13 @@
+"""
+First Past The Post Election Module
+
+This module defines the FirstPastThePost class, a subclass of the
+Election abstract base class.
+The FirstPastThePost class represents an election using the
+First Past The Post voting system, where the candidate or party with the
+most votes in a constituency wins.
+"""
+
 from typing import Dict
 
 import numpy as np
@@ -7,6 +17,20 @@ from elections.election_base import Election
 
 
 class FirstPastThePost(Election):
+    """
+    Class representing a First Past The Post election.
+
+    Attributes:
+    - election_name (str): The name/year of the election.
+    - maximum_coalition_size (int): The max number of parties in a coalition.
+
+    Properties:
+    - election_type (str): Property representing the type of the election.
+
+    Methods:
+    - _calculate_results(): Calculates the FPTP election results.
+    """
+
     def __init__(
             self,
             election_name: str,

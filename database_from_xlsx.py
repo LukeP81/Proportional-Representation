@@ -1,12 +1,26 @@
+"""
+Database Creation Module
+
+This module provides functions for processing election data from an Excel file
+and creating an SQLite database with the cleaned and transformed data.
+
+The module includes the following functions:
+- process_election_data: Cleans and transforms the input DataFrame.
+- valid_sheet: Checks if a given sheet name is valid based on specific criteria.
+- create_database: Creates an SQLite database from an Excel file, processing
+  each valid sheet and storing the results in separate tables.
+- main: Entry point of the module, creates the database from the specified
+  Excel file.
+"""
+
 import sqlite3
 
 from tqdm import tqdm
 import pandas as pd
 
-# elections before 1955 have constituencies with no Votes data
-MIN_ELECTION_YEAR = 1955
 EXCEL_FILE_PATH = "1918-2019election_results_by_pcon.xlsx"
 DATABASE_NAME = "elections.db"
+MIN_ELECTION_YEAR = 1955  # some constituencies have no Votes data before 1955
 
 
 def process_election_data(

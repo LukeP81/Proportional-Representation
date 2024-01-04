@@ -1,3 +1,16 @@
+"""
+Seat Comparisons Display Module
+
+This module provides functions for displaying a comparison of the number of
+seats for two different voting systems.
+
+The module includes the following functions:
+- _compare_voting_systems_seat_difference: Compares the results of two voting
+  systems and calculates the seat difference for each party.
+- display_seat_comparison: Displays a comparison of the number of seats for
+  two different voting systems using Streamlit metrics.
+"""
+
 import streamlit as st
 
 from elections.election_base import Election

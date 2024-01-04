@@ -1,3 +1,18 @@
+"""
+Proportional Representation Election Module
+
+This module defines the ProportionalRepresentation class, a subclass of the
+Election abstract base class.
+The ProportionalRepresentation class represents an election using the
+Proportional Representation voting system, where seats are allocated to parties
+based on their proportion of the vote. In particular, it uses the D'Hondt
+method which works by assigning seats based on the party that will have the most
+votes per seat for each consecutive seat awarded, for more detail see:
+https://en.wikipedia.org/wiki/D%27Hondt_method
+"""
+
+
+
 from collections import Counter
 from typing import Dict, List
 import heapq
@@ -9,6 +24,23 @@ from database_retriever import get_vote_data, get_regions
 
 
 class ProportionalRepresentation(Election):
+    """
+    Class representing a Proportional Representation election.
+
+    Attributes:
+    - election_name (str): The name of the election.
+    - maximum_coalition_size (int): The max number of parties in a coalition.
+    - pr_by_region (bool): Whether the PR is calculated by region.
+    - ignore_other (bool): Whether to ignore "Other" in calculations.
+
+    Properties:
+    - election_type (str): Property representing the type of the election.
+
+    Methods:
+    - _calculate_results(): Calculates the PR election results based on the specified parameters.
+    - _compute_seats_by_pr(parties: List[str], votes: np.ndarray) -> Dict[str, int]:
+      Computes the number of seats each party obtains in a PR election using the D'Hondt method.
+    """
     def __init__(
             self,
             election_name: str,

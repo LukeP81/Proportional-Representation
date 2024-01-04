@@ -1,3 +1,17 @@
+"""
+Ruling Governments Display Module
+
+This module provides functions for displaying information about the ruling
+government under a specific election and comparing viable ruling parties or
+coalitions between two electoral systems.
+
+The module includes the following functions:
+- display_ruling_government: Display information about the ruling
+  government under a specific election.
+- display_governments_comparison: Display a comparison of viable ruling parties
+  or coalitions between two electoral systems.
+"""
+
 import streamlit as st
 
 from elections.election_base import Election

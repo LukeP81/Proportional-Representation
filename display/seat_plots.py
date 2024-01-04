@@ -1,3 +1,21 @@
+"""
+Seat Plots Display Module
+
+This module provides functions for displaying side-by-side seat plots for
+two election systems.
+
+The module includes the following functions:
+- party_dot: Generate an HTML representation of a party dot, name, and seats.
+- party_legend: Generate an HTML legend based on election results and
+  party colors.
+- seat_scatter_array: Generate arrays for scatter plot coordinates based on the
+  number of seats.
+- party_traces: Generate scatter plot traces for each party based on election
+  results.
+- seat_plot_figure: Generate a Plotly figure for comparing two election results.
+- display_seat_plots: Display side-by-side seat plots for two election systems.
+"""
+
 from typing import List, Tuple
 import json
 

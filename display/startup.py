@@ -1,3 +1,23 @@
+"""
+Display and Configuration Module
+
+This module provides functions for setting up the Streamlit page, displaying
+initial components, and handling user interactions with the sidebar.
+
+The module includes the following functions:
+- startup: Sets up initial configurations for the Streamlit page.
+- improve_election_readability: Replaces election year with a more readable form.
+- setup_sidebar_options: Displays and retrieves configuration options from the
+  Streamlit sidebar.
+- change_current_election: Alters the current election in the session state based
+  on the provided offset.
+- next_button: Displays a button to navigate to the next election if available.
+- previous_button: Displays a button to navigate to the previous election if
+  available.
+- display_title: Displays the election title at the center of the page.
+- display_initial_page: Displays the initial components of the Streamlit page.
+"""
+
 from typing import Dict, Union
 
 import streamlit as st
