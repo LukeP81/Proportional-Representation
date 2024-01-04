@@ -1,6 +1,6 @@
-import math
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
+import math
 
 
 class NotCalculatedError(BaseException):
@@ -35,7 +35,6 @@ class Election(ABC):
         """
         Abstract property representing the type of the election.
         """
-        pass
 
     @property
     def results(self) -> dict:
@@ -86,7 +85,6 @@ class Election(ABC):
                  corresponding seat counts as values.
         :rtype: Dict[str, int]
         """
-        pass
 
     def calculate_coalitions(self) -> None:
         """

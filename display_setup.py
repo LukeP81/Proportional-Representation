@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Dict
+from typing import Dict, Union
 
 import streamlit as st
 
@@ -13,7 +13,7 @@ def configure_page() -> None:
     st.set_page_config(
         page_title="Proportional Representation",
         page_icon="🗳️",
-        layout="wide", # todo: Implement additional configuration for the menu
+        layout="wide",  # todo: Implement additional configuration for the menu
     )
 
 
@@ -38,8 +38,8 @@ def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
     """
     Display and retrieve configuration options from the Streamlit sidebar.
 
-    :return: Tuple of selected options.
-    :rtype: Tuple[str, bool, bool, bool, int]
+    :return: Dict of selected options.
+    :rtype: Dict[str, Union[str, bool, int]]
     """
 
     years = get_table_names()

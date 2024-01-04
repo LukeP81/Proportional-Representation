@@ -1,8 +1,8 @@
+from collections import Counter
 from typing import Dict, List
+import heapq
 
 import numpy as np
-import heapq
-from collections import Counter
 
 from election_base import Election
 from database_retriever import get_vote_data, get_regions
@@ -90,5 +90,4 @@ class PR(Election):
             votes_per_seat = -party_totals[party] / (obtained_seats[party] + 1)
             heapq.heappush(parties_min_heap, (votes_per_seat, party))
 
-        return {party: seats_obtained for party, seats_obtained in
-                zip(parties, obtained_seats)}
+        return dict(zip(parties, obtained_seats))

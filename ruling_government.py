@@ -26,7 +26,7 @@ def display_ruling_government(election: Election) -> None:
         st.markdown(bullet_points)
 
 
-def display_ruling_governments_comparison(
+def display_governments_comparison(
         system1_election: Election,
         system2_election: Election,
         maximum_coalition_size: int

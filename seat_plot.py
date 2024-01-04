@@ -1,5 +1,5 @@
-import json
 from typing import List, Tuple
+import json
 
 from plotly import graph_objects as go
 import numpy as np
@@ -127,7 +127,7 @@ def party_traces(
     :rtype: Tuple[List[go.Scatter], int]
     """
 
-    with open(file="party_colours.json") as file:
+    with open(file="party_colours.json", mode="r", encoding="utf-8") as file:
         party_colours = json.load(fp=file)
     max_y = sum(results.values()) // row_length * 2
     x_axis = np.arange(start=start_x + 1, stop=start_x + row_length + 1)
@@ -227,7 +227,7 @@ def display_seat_plots(
                     use_container_width=True,
                     config={"staticPlot": True})
 
-    with open(file="party_colours.json") as file:
+    with open(file="party_colours.json", mode="r", encoding="utf-8") as file:
         party_colours = json.load(fp=file)
     l, r = st.columns([14, 11])
     with l:

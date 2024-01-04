@@ -1,6 +1,6 @@
-import sqlite3
 from contextlib import contextmanager
 from typing import List, Optional, Tuple
+import sqlite3
 
 import numpy as np
 import streamlit as st

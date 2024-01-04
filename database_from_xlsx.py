@@ -5,6 +5,8 @@ import pandas as pd
 
 # elections before 1955 have constituencies with no Votes data
 MIN_ELECTION_YEAR = 1955
+EXCEL_FILE_PATH = "1918-2019election_results_by_pcon.xlsx"
+DATABASE_NAME = "elections.db"
 
 
 def process_election_data(
@@ -85,16 +87,13 @@ def create_database(
             if not valid_sheet(sheet_name):
                 continue
 
-            try:
-                election_data = pd.read_excel(io=xls,
-                                              sheet_name=sheet_name)
-                election_data = process_election_data(election_data=election_data)
-                election_data.to_sql(name=sheet_name,
-                                     con=conn,
-                                     index=False,
-                                     if_exists="replace")
-            except Exception as e:
-                print(f"Error processing sheet {sheet_name}: {e}")
+            election_data = pd.read_excel(io=xls,
+                                          sheet_name=sheet_name)
+            election_data = process_election_data(election_data=election_data)
+            election_data.to_sql(name=sheet_name,
+                                 con=conn,
+                                 index=False,
+                                 if_exists="replace")
 
 
 def main() -> None:
@@ -102,14 +101,8 @@ def main() -> None:
     Creates a database (.db file) from an excel file containing election data.
     """
 
-    excel_file_path = "1918-2019election_results_by_pcon.xlsx"
-    database_name = "elections.db"
-
-    try:
-        create_database(excel_file_path, database_name)
-        print(f"Database \"{database_name}\" successfully created.")
-    except Exception as e:
-        print(f"Error creating database: {e}")
+    create_database(EXCEL_FILE_PATH, DATABASE_NAME)
+    print(f"Database \"{DATABASE_NAME}\" successfully created.")
 
 
 if __name__ == "__main__":

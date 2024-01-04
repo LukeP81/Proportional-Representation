@@ -2,8 +2,8 @@ from typing import Dict
 
 import numpy as np
 
-from election_base import Election
 from database_retriever import get_vote_data
+from election_base import Election
 
 
 class FPTP(Election):
@@ -15,7 +15,7 @@ class FPTP(Election):
         """
         :param election_name: The name or year of the election.
         :type election_name: str
-        :param maximum_coalition_size: The maximum number of parties in a coalition.
+        :param maximum_coalition_size: The max number of parties in a coalition.
         :type maximum_coalition_size: int
         """
         super().__init__(election_name, maximum_coalition_size)
