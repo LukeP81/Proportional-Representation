@@ -11,7 +11,10 @@ import math
 
 
 class NotCalculatedError(BaseException):
-    pass
+    """
+    Custom exception raised when attempting to access election results or
+    coalitions before they have been calculated.
+    """
 
 
 class Election(ABC):
