@@ -35,7 +35,7 @@ import streamlit as st
 from display.ruling_governments import display_governments_comparison
 from display.seat_comparisons import display_seat_comparison
 from display.seat_plots import display_seat_plots
-from display.startup import display_initial_page
+from display.startup import display_initial_page, PageLayout
 from elections.election_fptp import FirstPastThePost
 from elections.election_pr import ProportionalRepresentation
 
@@ -52,42 +52,26 @@ pr_election = ProportionalRepresentation(
     election_name=sidebar_options["election_name"],
     maximum_coalition_size=sidebar_options["maximum_coalition_size"],
     ignore_other=sidebar_options["ignore_other_pr"],
-    pr_by_region=sidebar_options["pr_by_region"]
+    pr_method=sidebar_options["pr_method"]
 )
 pr_election.calculate_results()
 pr_election.calculate_coalitions()
 
-if sidebar_options["tab_layout"]:
-    seat_plot_tab, seats_comparison_tab, coalitions_tab = st.tabs(
-        ["Seat Plot", "Seats Gained/Lost", "Ruling Party/Coalitions"])
+kwargs = {"system1_election": fptp_election,
+          "system2_election": pr_election}
 
-    with seat_plot_tab:
-        display_seat_plots(
-            system1_election=fptp_election,
-            system2_election=pr_election)
+display_order = {"Seat Plot": display_seat_plots,
+                 "Seats Gained/Lost": display_seat_comparison,
+                 "Ruling Party/Coalitions": display_governments_comparison}
 
-    with seats_comparison_tab:
-        display_seat_comparison(
-            system1_election=fptp_election,
-            system2_election=pr_election)
+if sidebar_options["page_layout"] == PageLayout.TAB_LAYOUT:
+    tabs = st.tabs(display_order.keys())
+    for tab, display_function in zip(tabs, display_order.values()):
+        with tab:
+            display_function(**kwargs)
 
-    with coalitions_tab:
-        display_governments_comparison(
-            system1_election=fptp_election,
-            system2_election=pr_election,
-            maximum_coalition_size=sidebar_options["maximum_coalition_size"])
-
-
-else:
-    display_seat_plots(
-        system1_election=fptp_election,
-        system2_election=pr_election)
-    st.divider()
-    display_seat_comparison(
-        system1_election=fptp_election,
-        system2_election=pr_election)
-    st.divider()
-    display_governments_comparison(
-        system1_election=fptp_election,
-        system2_election=pr_election,
-        maximum_coalition_size=sidebar_options["maximum_coalition_size"])
+if sidebar_options["page_layout"] == PageLayout.SCROLLING_LAYOUT:
+    for i, display_function in enumerate(display_order.values()):
+        if i > 0:
+            st.divider()
+        display_function(**kwargs)

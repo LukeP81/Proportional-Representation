@@ -35,7 +35,10 @@ def _compare_voting_systems_seat_difference(
 
     differences = {
         key: int(system2_results.get(key, 0) - system1_results.get(key, 0))
-        for key in set(system1_results) | set(system2_results)}
+        for key in set(system1_results) | set(system2_results)
+        if int(system2_results.get(key, 0) - system1_results.get(key, 0)) != 0
+    }
+
     return dict(sorted(differences.items(),
                        key=lambda x: abs(x[1]),
                        reverse=True))
@@ -65,16 +68,14 @@ def display_seat_comparison(
 
     left_column, right_column = st.columns(2)
     for i, (metric, value) in enumerate(seat_differences.items()):
-        if value == 0:
-            continue
 
-        if i % 2 == 0:
-            left_column.metric(label=metric,
+        if i > len(seat_differences)/2:
+            right_column.metric(label=metric,
                                value=metric,
                                delta=value,
                                label_visibility="hidden")
         else:
-            right_column.metric(label=metric,
+            left_column.metric(label=metric,
                                 value=metric,
                                 delta=value,
                                 label_visibility="hidden")

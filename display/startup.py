@@ -16,13 +16,61 @@ The module includes the following functions:
   available.
 - display_title: Displays the election title at the center of the page.
 - display_initial_page: Displays the initial components of the Streamlit page.
+
+Enumerations:
+- PageLayout: Represents different page layout options.
+- MethodForPR: Defines different methods for Proportional Representation.
 """
 
+from enum import Enum
 from typing import Dict, Union
 
 import streamlit as st
 
 from database_retriever import get_table_names
+from elections.election_pr import MethodForPR
+
+
+class PageLayout(Enum):
+    """
+    Enumeration representing different page layout options.
+    """
+
+    TAB_LAYOUT = "Tab Layout"
+    SCROLLING_LAYOUT = "Scrolling Layout"
+
+
+ConfigurationOptionTypes = Union[str, PageLayout, bool, MethodForPR, int]
+
+
+def get_enum_value(enum_name: Enum) -> str:
+    """
+    Get the value associated with an enum member.
+
+    :param enum_name: The enum member.
+    :type enum_name: Enum
+    :return: The value associated with the enum member.
+    :rtype: str
+    """
+
+    return str(enum_name.value)
+
+
+def improve_election_readability(
+        election: str
+) -> str:
+    """
+    Replace election year with more readable form.
+    This only affects 1974 elections.
+
+    :param election: Election year.
+    :type election: str
+    :return: Comprehensible election title.
+    :rtype: str
+    """
+
+    replacement_names = {"1974F": "1974 February", "1974O": "1974 October"}
+    return replacement_names.get(election, election)
 
 
 def startup() -> None:
@@ -59,69 +107,44 @@ def startup() -> None:
         st.session_state["current_election"] = st.session_state["elections"][-1]
 
 
-def improve_election_readability(
-        election: str
-) -> str:
-    """
-    Replace election year with more readable form.
-    This only affects 1974 elections.
-
-    :param election: Election year.
-    :type election: str
-    :return: Comprehensible election title.
-    :rtype: str
-    """
-
-    replacement_names = {"1974F": "1974 February", "1974O": "1974 October"}
-    return replacement_names.get(election, election)
-
-
-def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
+def setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
     """
     Display and retrieve configuration options from the Streamlit sidebar.
 
     :return: Dict of selected options.
-    :rtype: Dict[str, Union[str, bool, int]]
+    :rtype: Dict[str, Union[str, PageLayout, bool, MethodForPR, int]]
     """
 
-    def on_election_slider_change():
+    def on_election_change():
         chosen_election = st.session_state["sidebar_election_name"]
         st.session_state["current_election"] = chosen_election
 
-    election_name = st.sidebar.select_slider(
+    election_options = list(reversed(st.session_state["elections"]))
+    election_name = st.sidebar.selectbox(
         label="Election",
-        options=st.session_state["elections"],
-        value=st.session_state["current_election"],
+        options=election_options,
+        index=election_options.index(st.session_state["current_election"]),
         format_func=improve_election_readability,
         key="sidebar_election_name",
         help="Use the slider to select the election",
-        on_change=on_election_slider_change
+        on_change=on_election_change
     )
 
-    pr_by_region_options = {"By Region": True, "Entire Electorate": False, }
-    pr_by_region_radio = st.sidebar.radio(
-        label="PR method",
-        options=pr_by_region_options.keys(),
+    pr_method = st.sidebar.radio(
+        label="PR Method",
+        options=MethodForPR,
+        format_func=get_enum_value,
         key="sidebar_pr_by_region",
         help="""Select how the PR will be performed by the D'Hondt method:
              \n-By Region: Utilizes individual regions for PR and sums the seats
              \n-Entire Electorate: Performs PR directly on the total votes"""
     )
-    pr_by_region = pr_by_region_options[pr_by_region_radio]
 
     ignore_other_pr = st.sidebar.toggle(
         label="Ignore Other in PR", value=True,
         key="sidebar_pr_ignore_other",
         help="Exclude votes classified as 'Other' from the PR calculation"
     )
-
-    tab_layout = st.sidebar.toggle(
-        label="Tab Layout",
-        value=False,
-        key="sidebar_tab_layout",
-        help="Displays the page in a tab layout if enabled"
-    )
-
     maximum_coalition_size = st.sidebar.number_input(
         label="Maximum Coalition Size",
         min_value=2,
@@ -129,12 +152,22 @@ def setup_sidebar_options() -> Dict[str, Union[str, bool, int]]:
         key="sidebar_maximum_coalition_size",
         help="The maximum number of parties allowed in a coalition"
     )
+    page_layout = st.sidebar.radio(
+        label="Page Layout",
+        options=PageLayout,
+        format_func=get_enum_value,
+        key="sidebar_page_layout",
+        help="""Select how the page is displayed:
+             \n-Tab Layout: the different sections are accessed through tabs
+             \n-Scrolling Layout: the different sections are accessed through 
+                scrolling"""
+    )
 
     return {
         "election_name": election_name,
-        "pr_by_region": pr_by_region,
+        "pr_method": pr_method,
         "ignore_other_pr": ignore_other_pr,
-        "tab_layout": tab_layout,
+        "page_layout": page_layout,
         "maximum_coalition_size": maximum_coalition_size
     }
 
@@ -199,7 +232,7 @@ def display_title(
     st.markdown(title_html, unsafe_allow_html=True)
 
 
-def display_initial_page() -> Dict[str, Union[str, bool, int]]:
+def display_initial_page() -> Dict[str, ConfigurationOptionTypes]:
     """
     Display the initial components of the Streamlit page.
 

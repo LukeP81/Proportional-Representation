@@ -9,9 +9,13 @@ based on their proportion of the vote. In particular, it uses the D'Hondt
 method which works by assigning seats based on the party that will have the most
 votes per seat for each consecutive seat awarded, for more detail see:
 https://en.wikipedia.org/wiki/D%27Hondt_method
+
+Enumerations:
+- MethodForPR: Defines different methods for Proportional Representation.
 """
 
 from collections import Counter
+from enum import Enum
 from typing import Dict, List
 import heapq
 
@@ -21,6 +25,15 @@ from elections.election_base import Election
 from database_retriever import get_vote_data, get_regions
 
 
+class MethodForPR(Enum):
+    """
+    Enumeration defining different methods for Proportional Representation.
+    """
+
+    BY_REGION = "By Region"
+    ENTIRE_ELECTORATE = "Entire Electorate"
+
+
 class ProportionalRepresentation(Election):
     """
     Class representing a Proportional Representation election.
@@ -28,7 +41,7 @@ class ProportionalRepresentation(Election):
     Attributes:
     - election_name (str): The name of the election.
     - maximum_coalition_size (int): The max number of parties in a coalition.
-    - pr_by_region (bool): Whether the PR is calculated by region.
+    - pr_method (MethodForPR.BY_REGION): Method for the PR calculation.
     - ignore_other (bool): Whether to ignore "Other" in calculations.
 
     Properties:
@@ -39,13 +52,15 @@ class ProportionalRepresentation(Election):
         specified parameters.
     - _compute_seats_by_pr: Computes the number of seats each party obtains in a
         PR election using the D'Hondt method.
+    - _calculate_entire_electorate: Calculates results for the entire electorate.
+    - _calculate_by_region: Calculates results by individual regions.
     """
 
     def __init__(
             self,
             election_name: str,
             maximum_coalition_size: int,
-            pr_by_region: bool = True,
+            pr_method: MethodForPR = MethodForPR.BY_REGION,
             ignore_other: bool = True
     ):
         """
@@ -53,14 +68,14 @@ class ProportionalRepresentation(Election):
         :type election_name: str
         :param maximum_coalition_size: The max number of parties in a coalition.
         :type maximum_coalition_size: int
-        :param pr_by_region: Whether the PR is calculated by region.
-        :type pr_by_region: bool
+        :param pr_method: How the PR is calculated.
+        :type pr_method: bool
         :param ignore_other: Whether to ignore "Other" in calculations.
         :type ignore_other: bool
         """
 
         super().__init__(election_name, maximum_coalition_size)
-        self.pr_by_region = pr_by_region
+        self.pr_method = pr_method
         self.ignore_other = ignore_other
 
     @property
@@ -69,27 +84,6 @@ class ProportionalRepresentation(Election):
         Property representing the type of the election.
         """
         return "Proportional Representation"
-
-    def _calculate_results(self) -> Dict[str, int]:
-        """
-        Calculates the PR election results based on the specified parameters.
-        """
-        if not self.pr_by_region:
-            parties, votes = get_vote_data(table_name=self.election_name,
-                                           ignore_other=self.ignore_other)
-            results = self._compute_seats_by_pr(parties=parties, votes=votes)
-            return self.sort_results(results=results)
-
-        regions = get_regions(table_name=self.election_name)
-        region_seats = []
-        for region in regions:
-            parties, votes = get_vote_data(table_name=self.election_name,
-                                           region=region,
-                                           ignore_other=self.ignore_other)
-            region_seats.append(self._compute_seats_by_pr(parties=parties,
-                                                          votes=votes))
-        return self.sort_results(results=dict(
-            sum([Counter(region) for region in region_seats], Counter())))
 
     @staticmethod
     def _compute_seats_by_pr(
@@ -109,6 +103,7 @@ class ProportionalRepresentation(Election):
                  corresponding seat counts as values.
         :rtype: Dict[str, int]
         """
+
         total_seats = np.shape(votes)[0]
         party_totals = np.sum(votes, axis=0)
 
@@ -123,3 +118,48 @@ class ProportionalRepresentation(Election):
             heapq.heappush(parties_min_heap, (votes_per_seat, party))
 
         return dict(zip(parties, obtained_seats))
+
+    def _calculate_entire_electorate(self) -> Dict[str, int]:
+        """
+        Calculate PR election results for the entire electorate.
+
+        :return: A dictionary containing party names as keys and their
+                 corresponding seat counts as values.
+        :rtype: Dict[str, int]
+        """
+
+        parties, votes = get_vote_data(table_name=self.election_name,
+                                       ignore_other=self.ignore_other)
+        results = self._compute_seats_by_pr(parties=parties, votes=votes)
+        return self.sort_results(results=results)
+
+    def _calculate_by_region(self) -> Dict[str, int]:
+        """
+        Calculate PR election results by individual regions.
+
+        :return: A dictionary containing party names as keys and their
+                 corresponding seat counts as values.
+        :rtype: Dict[str, int]
+        """
+
+        regions = get_regions(table_name=self.election_name)
+        region_seats = []
+        for region in regions:
+            parties, votes = get_vote_data(table_name=self.election_name,
+                                           region=region,
+                                           ignore_other=self.ignore_other)
+            region_seats.append(self._compute_seats_by_pr(parties=parties,
+                                                          votes=votes))
+        return self.sort_results(results=dict(
+            sum([Counter(region) for region in region_seats], Counter())))
+
+    def _calculate_results(self) -> Dict[str, int]:
+        """
+        Calculates the PR election results based on the chosen method.
+        """
+
+        methods = {
+            MethodForPR.BY_REGION: self._calculate_by_region,
+            MethodForPR.ENTIRE_ELECTORATE: self._calculate_entire_electorate
+        }
+        return methods[self.pr_method]()

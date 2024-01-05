@@ -129,7 +129,6 @@ def seat_scatter_array(
 
 def party_traces(
         results: dict,
-        start_x: int = 0,
         row_length: int = 50
 ) -> Tuple[List[go.Scatter], int]:
     """
@@ -137,8 +136,6 @@ def party_traces(
 
     :param results: A dictionary containing party names and their seats.
     :type results: dict
-    :param start_x: The starting position on the x-axis for the first election.
-    :type start_x: int
     :param row_length: The maximum number of seats per row.
     :type row_length: int
     :return: Tuple containing a list of Scatter traces and the ending row.
@@ -148,7 +145,7 @@ def party_traces(
     with open(file="party_colours.json", mode="r", encoding="utf-8") as file:
         party_colours = json.load(fp=file)
     max_y = sum(results.values()) // row_length * 2
-    x_axis = np.arange(start=start_x + 1, stop=start_x + row_length + 1)
+    x_axis = np.arange(start=1, stop=row_length + 1)
     y_axis = np.arange(start=-1, stop=-(max_y + 1), step=-1)
 
     start_row = 0
@@ -172,36 +169,26 @@ def party_traces(
 
 
 def seat_plot_figure(
-        election1_results: dict,
-        election2_results: dict
+        election_results: dict
 ) -> go.Figure:
     """
     Generate a Plotly figure for comparing two election results.
 
-    :param election1_results: A dictionary containing party names and
+    :param election_results: A dictionary containing party names and
            their corresponding votes for the first election.
-    :type election1_results: dict
-    :param election2_results: A dictionary containing party names and
-           their corresponding votes for the second election.
-    :type election2_results: dict
+    :type election_results: dict
     :return: A Plotly Figure object.
     :rtype: go.Figure
     """
 
-    offset = 15
     x_width = 50
-    election1_traces, max_height1 = party_traces(results=election1_results,
-                                                 row_length=x_width)
-    election2_traces, max_height2 = party_traces(results=election2_results,
-                                                 start_x=offset + x_width,
-                                                 row_length=x_width)
-    max_height = max(max_height1, max_height2)
+    election1_traces, max_height = party_traces(results=election_results,
+                                                row_length=x_width)
 
     seat_plot = go.Figure()
     for trace in election1_traces:
         seat_plot.add_trace(trace=trace)
-    for trace in election2_traces:
-        seat_plot.add_trace(trace=trace)
+
     seat_plot.update_layout(height=max_height * 15,
                             margin={'l': 0, 'r': 0, 't': 0, 'b': 0},
                             plot_bgcolor='rgba(0,0,0,0)',
@@ -210,13 +197,36 @@ def seat_plot_figure(
                                 'showgrid': False,
                                 'zeroline': False,
                                 'showticklabels': False,
-                                'range': [0.5, offset + x_width * 2 + 0.5], },
+                                'range': [0.5, x_width + 0.5], },
                             yaxis={
                                 'showgrid': False,
                                 'zeroline': False,
                                 'showticklabels': False,
                                 'range': [-(max_height + 0.5), -0.5], })
     return seat_plot
+
+
+def display_seat_plot(
+        election: Election,
+        party_colours: dict,
+) -> None:
+    """
+    Display a seat plot for an election.
+
+    :param election: An Election object for the first election system.
+    :type election: Election
+    :param party_colours: A dictionary containing party names and their colors.
+    :type party_colours: dict
+    """
+
+    st.header(election.election_type)
+    seat_plot = seat_plot_figure(election_results=election.results)
+    st.plotly_chart(figure_or_data=seat_plot,
+                    use_container_width=True,
+                    config={"staticPlot": True})
+    st.markdown(party_legend(results=election.results,
+                             party_colours=party_colours),
+                unsafe_allow_html=True)
 
 
 def display_seat_plots(
@@ -231,28 +241,11 @@ def display_seat_plots(
     :param system2_election: An Election object for the second election system.
     :type system2_election: Election
     """
-
-    seat_plot = seat_plot_figure(election1_results=system1_election.results,
-                                 election2_results=system2_election.results)
-
-    l, r = st.columns([14, 11])
-    with l:
-        st.header(system1_election.election_type)
-    with r:
-        st.header(system2_election.election_type)
-
-    st.plotly_chart(figure_or_data=seat_plot,
-                    use_container_width=True,
-                    config={"staticPlot": True})
-
     with open(file="party_colours.json", mode="r", encoding="utf-8") as file:
         party_colours = json.load(fp=file)
-    l, r = st.columns([14, 11])
-    with l:
-        st.markdown(party_legend(results=system1_election.results,
-                                 party_colours=party_colours),
-                    unsafe_allow_html=True)
-    with r:
-        st.markdown(party_legend(results=system2_election.results,
-                                 party_colours=party_colours),
-                    unsafe_allow_html=True)
+
+    left_column, _, right_column = st.columns([11, 3, 11])
+    with left_column:
+        display_seat_plot(system1_election, party_colours)
+    with right_column:
+        display_seat_plot(system2_election, party_colours)
