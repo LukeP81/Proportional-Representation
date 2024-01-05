@@ -243,7 +243,8 @@ def display_initial_page() -> Dict[str, ConfigurationOptionTypes]:
     startup()
     sidebar_options = setup_sidebar_options()
 
-    left_column, _, right_column = st.columns([1, 5, 1])
+    _,centre,_ = st.columns([1, 1, 1])
+    left_column, right_column = centre.columns(2)
     with left_column:
         previous_button()
     with right_column:
