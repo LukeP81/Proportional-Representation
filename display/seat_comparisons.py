@@ -69,13 +69,13 @@ def display_seat_comparison(
     left_column, right_column = st.columns(2)
     for i, (metric, value) in enumerate(seat_differences.items()):
 
-        if i > len(seat_differences)/2:
+        if i > len(seat_differences) / 2:
             right_column.metric(label=metric,
-                               value=metric,
-                               delta=value,
-                               label_visibility="hidden")
-        else:
-            left_column.metric(label=metric,
                                 value=metric,
                                 delta=value,
                                 label_visibility="hidden")
+        else:
+            left_column.metric(label=metric,
+                               value=metric,
+                               delta=value,
+                               label_visibility="hidden")
