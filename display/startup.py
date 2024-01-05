@@ -243,12 +243,12 @@ def display_initial_page() -> Dict[str, ConfigurationOptionTypes]:
     startup()
     sidebar_options = setup_sidebar_options()
 
-    left_column, middle_column, right_column = st.columns([1, 5, 1])
+    left_column, _, right_column = st.columns([1, 5, 1])
     with left_column:
         previous_button()
     with right_column:
         next_button()
-    with middle_column:
-        display_title(election_name=sidebar_options["election_name"])
+
+    display_title(election_name=sidebar_options["election_name"])
 
     return sidebar_options

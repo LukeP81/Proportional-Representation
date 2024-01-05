@@ -58,7 +58,7 @@ def display_governments_comparison(
 
     st.write(
         f"*Only based on numbers of seats and a maximum coalition size of "
-        f"{system1_election.maximum_coalition_size}"
+        f"{system1_election.maximum_coalition_size} "
         f"(configurable in sidebar)*")
 
     left_col, right_col = st.columns(2)
