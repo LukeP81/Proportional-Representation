@@ -1,0 +1,10 @@
+pandas-stubs
+types-Pillow
+types-cachetools
+types-colorama
+types-jsonschema
+types-protobuf
+types-pycurl
+types-python-dateutil
+types-toml
+types-tqdm

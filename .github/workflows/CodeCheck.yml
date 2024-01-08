@@ -20,6 +20,7 @@ jobs:
         pip install flake8
         pip install pylint
         pip install mypy
+        pip install -r mypy_stubs.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -29,4 +30,4 @@ jobs:
         pylint $(git ls-files '*.py')
     - name: Lint with mypy
       run: |
-        mypy --install-types $(git ls-files '*.py')
+        mypy $(git ls-files '*.py')
