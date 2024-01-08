@@ -41,11 +41,11 @@ class Comparisons:
         :type system1_election: elections.Election
         :param system2_election: The election object for the second system.
         :type system2_election: elections.Election
-        :param display_methods: List of decorated functions for displaying comparisons.
+        :param display_methods: Functions for displaying comparisons.
         :type display_methods: List[callable]
         :param tab_names: List of names for tabs in the layout.
         :type tab_names: List[str]
-        :param layout: PageLayout enumeration indicating the desired layout type (default is TAB_LAYOUT).
+        :param layout: PageLayout enumeration indicating the desired layout type.
         :type layout: PageLayout
         """
 

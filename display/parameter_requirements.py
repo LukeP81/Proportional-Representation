@@ -53,8 +53,8 @@ def comparison_method(func: callable) -> callable:
 
     if expected_parameters != function_parameters:
         raise ParameterError(
-            f"""Function {func.__name__} must only have the parameters 
-            "system1_election, system2_election"
+            f"""Function {func.__name__} must only have the parameters
+            " system1_election, system2_election"
             """)
 
     @functools.wraps(func)

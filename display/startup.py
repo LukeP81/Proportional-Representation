@@ -159,8 +159,8 @@ def _setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
         key="sidebar_page_layout",
         help="""Select how the page is displayed:
              \n-Tab Layout: the different sections are accessed through tabs
-             \n-Scrolling Layout: the different sections are accessed through 
-                scrolling"""
+             \n-Scrolling Layout: the different sections are accessed through
+                 scrolling"""
     )
 
     return {
