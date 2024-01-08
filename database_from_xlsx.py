@@ -49,7 +49,7 @@ def process_election_data(
             1, i if clean_name == "Votes" else i - 1]
         election_data.iloc[2, i] = f"{clean_name}-{party_name}"
 
-    election_data.columns = pd.Index(election_data.iloc[2],dtype=str)
+    election_data.columns = pd.Index(election_data.iloc[2], dtype=str)
     election_data = election_data.iloc[3:, :].dropna(
         subset=["id"]
     ).reset_index(
