@@ -66,10 +66,10 @@ class Election(ABC):
         self.vote_data = vote_data
         self.maximum_coalition_size = maximum_coalition_size
 
-        self._results = None
+        self._results = {}
         self._results_calculated = False
 
-        self._coalitions = None
+        self._coalitions = []
         self._coalitions_calculated = False
 
     @property
