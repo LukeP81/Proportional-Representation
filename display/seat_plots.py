@@ -23,10 +23,11 @@ from plotly import graph_objects as go
 import numpy as np
 import streamlit as st
 
-from elections.election_base import Election
+from display.parameter_requirements import comparison_method
+import elections
 
 
-def party_dot(
+def _party_dot(
         party: str,
         votes: int,
         colour: str = "#808080"
@@ -66,7 +67,7 @@ def party_dot(
     """
 
 
-def party_legend(
+def _party_legend(
         results: dict,
         party_colours: dict
 ) -> str:
@@ -86,13 +87,13 @@ def party_legend(
         if votes == 0:
             continue
         colour = party_colours.get(party, "#808080")
-        party_dots.append(party_dot(party=party,
-                                    votes=votes,
-                                    colour=colour))
+        party_dots.append(_party_dot(party=party,
+                                     votes=votes,
+                                     colour=colour))
     return "".join(party_dots)
 
 
-def seat_scatter_array(
+def _seat_scatter_array(
         x_axis: np.ndarray,
         y_axis: np.ndarray,
         num_seats: int,
@@ -127,7 +128,7 @@ def seat_scatter_array(
     return x_flat, y_flat, end_row
 
 
-def party_traces(
+def _party_traces(
         results: dict,
         row_length: int = 50
 ) -> Tuple[List[go.Scatter], int]:
@@ -153,11 +154,11 @@ def party_traces(
     for party, seats in results.items():
         if seats == 0:
             continue
-        x_flat, y_flat, start_row = seat_scatter_array(x_axis=x_axis,
-                                                       y_axis=y_axis,
-                                                       num_seats=seats,
-                                                       start_row=start_row,
-                                                       row_length=row_length)
+        x_flat, y_flat, start_row = _seat_scatter_array(x_axis=x_axis,
+                                                        y_axis=y_axis,
+                                                        num_seats=seats,
+                                                        start_row=start_row,
+                                                        row_length=row_length)
         party_colour = party_colours.get(party, "#808080")
         traces.append(go.Scatter(x=x_flat,
                                  y=y_flat,
@@ -168,7 +169,7 @@ def party_traces(
     return traces, start_row
 
 
-def seat_plot_figure(
+def _seat_plot_figure(
         election_results: dict
 ) -> go.Figure:
     """
@@ -182,8 +183,8 @@ def seat_plot_figure(
     """
 
     x_width = 50
-    election1_traces, max_height = party_traces(results=election_results,
-                                                row_length=x_width)
+    election1_traces, max_height = _party_traces(results=election_results,
+                                                 row_length=x_width)
 
     seat_plot = go.Figure()
     for trace in election1_traces:
@@ -206,8 +207,8 @@ def seat_plot_figure(
     return seat_plot
 
 
-def display_seat_plot(
-        election: Election,
+def _seat_plot(
+        election: elections.Election,
         party_colours: dict,
 ) -> None:
     """
@@ -220,18 +221,19 @@ def display_seat_plot(
     """
 
     st.header(election.election_type)
-    seat_plot = seat_plot_figure(election_results=election.results)
+    seat_plot = _seat_plot_figure(election_results=election.results)
     st.plotly_chart(figure_or_data=seat_plot,
                     use_container_width=True,
                     config={"staticPlot": True})
-    st.markdown(party_legend(results=election.results,
-                             party_colours=party_colours),
+    st.markdown(_party_legend(results=election.results,
+                              party_colours=party_colours),
                 unsafe_allow_html=True)
 
 
-def display_seat_plots(
-        system1_election: Election,
-        system2_election: Election
+@comparison_method
+def seat_plots(
+        system1_election: elections.Election,
+        system2_election: elections.Election
 ) -> None:
     """
     Display side-by-side seat plots for two election systems.
@@ -246,6 +248,6 @@ def display_seat_plots(
 
     left_column, _, right_column = st.columns([11, 3, 11])
     with left_column:
-        display_seat_plot(system1_election, party_colours)
+        _seat_plot(system1_election, party_colours)
     with right_column:
-        display_seat_plot(system2_election, party_colours)
+        _seat_plot(system2_election, party_colours)

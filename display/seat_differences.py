@@ -13,10 +13,11 @@ The module includes the following functions:
 
 import streamlit as st
 
-from elections.election_base import Election
+from display.parameter_requirements import comparison_method
+import elections
 
 
-def _compare_voting_systems_seat_difference(
+def _seat_difference(
         system1_results: dict,
         system2_results: dict
 ) -> dict:
@@ -44,9 +45,10 @@ def _compare_voting_systems_seat_difference(
                        reverse=True))
 
 
-def display_seat_comparison(
-        system1_election: Election,
-        system2_election: Election
+@comparison_method
+def seat_comparison(
+        system1_election: elections.Election,
+        system2_election: elections.Election,
 ) -> None:
     """
     Displays a comparison of the number of seats any particular party receives
@@ -58,7 +60,7 @@ def display_seat_comparison(
     :type system2_election: Election
     """
 
-    seat_differences = _compare_voting_systems_seat_difference(
+    seat_differences = _seat_difference(
         system1_results=system1_election.results,
         system2_results=system2_election.results)
     st.header("Seats Gained/Lost")

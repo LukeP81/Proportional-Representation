@@ -9,6 +9,8 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 import math
 
+import election_data
+
 
 class NotCalculatedError(BaseException):
     """
@@ -50,6 +52,7 @@ class Election(ABC):
     def __init__(
             self,
             election_name: str,
+            vote_data: election_data.ElectionData,
             maximum_coalition_size: int = 3
     ):
         """
@@ -60,6 +63,7 @@ class Election(ABC):
         """
 
         self.election_name = election_name
+        self.vote_data = vote_data
         self.maximum_coalition_size = maximum_coalition_size
 
         self._results = None
@@ -72,7 +76,10 @@ class Election(ABC):
     @abstractmethod
     def election_type(self) -> str:
         """
-        Abstract property representing the type of the election.
+        Property representing the type of the election.
+
+        :return: The type of the election.
+        :rtype: str
         """
 
     @property
@@ -85,6 +92,7 @@ class Election(ABC):
         :rtype: Dict[str, int]
         :raises NotCalculatedError: If results have not been calculated.
         """
+
         if not self._results_calculated:
             raise NotCalculatedError(
                 "Results not calculated. Call calculate_results first.")
@@ -101,15 +109,25 @@ class Election(ABC):
         :rtype: List[List[str]]
         :raises NotCalculatedError: If results have not been calculated.
         """
+
         if not self._coalitions_calculated:
             raise NotCalculatedError(
                 "Results not calculated. Call calculate_results first.")
         return self._coalitions
 
+    def calculate_all(self) -> None:
+        """
+        Calls all calculates methods.
+        """
+
+        self.calculate_results()
+        self.calculate_coalitions()
+
     def calculate_results(self) -> None:
         """
         Calculates the election results and marks them as calculated.
         """
+
         results = self._calculate_results()
         self._results = results
         self._results_calculated = True
@@ -130,14 +148,24 @@ class Election(ABC):
         Calculates the valid coalitions based on election results and
         marks them as calculated.
         """
+
+        if not self._results_calculated:
+            raise NotCalculatedError(
+                "Results not calculated. Call calculate_results first.")
+
         coalitions = self._calculate_coalitions()
         self._coalitions = coalitions
         self._coalitions_calculated = True
 
     def _calculate_coalitions(self) -> Optional[List[List[str]]]:
         """
-        Private method to calculate valid coalitions based on election results.
+        Method to calculate valid coalitions based on election results.
+
+        :return: A list of valid coalitions, represented as a list of party names.
+                 Returns None if no valid coalitions are found.
+        :rtype: Optional[List[List[str]]]
         """
+
         total = sum(self.results.values())
 
         sorted_list = sorted(
@@ -175,6 +203,7 @@ class Election(ABC):
         :return: List of valid coalitions.
         :rtype: List[List[str]]
         """
+
         if current_selection is None:
             current_selection = []
 

@@ -1,10 +1,11 @@
 """
-Database Creation Module
+Database Creation File
 
-This module provides functions for processing election data from an Excel file
+This file provides functions for processing election data from an Excel file
 and creating an SQLite database with the cleaned and transformed data.
+This should ideally be a single use file.
 
-The module includes the following functions:
+The file includes the following functions:
 - process_election_data: Cleans and transforms the input DataFrame.
 - valid_sheet: Checks if a given sheet name is valid based on specific criteria.
 - create_database: Creates an SQLite database from an Excel file, processing

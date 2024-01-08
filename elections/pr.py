@@ -21,8 +21,8 @@ import heapq
 
 import numpy as np
 
-from elections.election_base import Election
-from database_retriever import get_vote_data, get_regions
+from elections.base import Election
+import election_data
 
 
 class MethodForPR(Enum):
@@ -59,6 +59,7 @@ class ProportionalRepresentation(Election):
     def __init__(
             self,
             election_name: str,
+            vote_data: election_data.DatabaseElectionData,
             maximum_coalition_size: int,
             pr_method: MethodForPR = MethodForPR.BY_REGION,
             ignore_other: bool = True
@@ -74,15 +75,12 @@ class ProportionalRepresentation(Election):
         :type ignore_other: bool
         """
 
-        super().__init__(election_name, maximum_coalition_size)
+        super().__init__(election_name, vote_data, maximum_coalition_size)
         self.pr_method = pr_method
         self.ignore_other = ignore_other
 
     @property
     def election_type(self) -> str:
-        """
-        Property representing the type of the election.
-        """
         return "Proportional Representation"
 
     @staticmethod
@@ -128,8 +126,9 @@ class ProportionalRepresentation(Election):
         :rtype: Dict[str, int]
         """
 
-        parties, votes = get_vote_data(table_name=self.election_name,
-                                       ignore_other=self.ignore_other)
+        parties, votes = self.vote_data.get_vote_data(
+            election_name=self.election_name,
+            ignore_other=self.ignore_other)
         results = self._compute_seats_by_pr(parties=parties, votes=votes)
         return self.sort_results(results=results)
 
@@ -142,12 +141,13 @@ class ProportionalRepresentation(Election):
         :rtype: Dict[str, int]
         """
 
-        regions = get_regions(table_name=self.election_name)
+        regions = self.vote_data.get_regions(election_name=self.election_name)
         region_seats = []
         for region in regions:
-            parties, votes = get_vote_data(table_name=self.election_name,
-                                           region=region,
-                                           ignore_other=self.ignore_other)
+            parties, votes = self.vote_data.get_vote_data(
+                election_name=self.election_name,
+                region=region,
+                ignore_other=self.ignore_other)
             region_seats.append(self._compute_seats_by_pr(parties=parties,
                                                           votes=votes))
         return self.sort_results(results=dict(

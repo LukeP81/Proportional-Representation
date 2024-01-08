@@ -14,10 +14,13 @@ The module includes the following functions:
 
 import streamlit as st
 
-from elections.election_base import Election
+from display.parameter_requirements import comparison_method
+import elections
 
 
-def display_ruling_government(election: Election) -> None:
+def _ruling_government(
+        election: elections.Election
+) -> None:
     """
     Display information about the ruling government under a specific election.
 
@@ -40,9 +43,10 @@ def display_ruling_government(election: Election) -> None:
         st.markdown(bullet_points)
 
 
-def display_governments_comparison(
-        system1_election: Election,
-        system2_election: Election,
+@comparison_method
+def governments_comparison(
+        system1_election: elections.Election,
+        system2_election: elections.Election,
 ) -> None:
     """
     Display a comparison of viable ruling parties or coalitions between
@@ -63,6 +67,6 @@ def display_governments_comparison(
 
     left_col, right_col = st.columns(2)
     with left_col:
-        display_ruling_government(election=system1_election)
+        _ruling_government(election=system1_election)
     with right_col:
-        display_ruling_government(election=system2_election)
+        _ruling_government(election=system2_election)

@@ -23,12 +23,11 @@ Enumerations:
 """
 
 from enum import Enum
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 import streamlit as st
 
-from database_retriever import get_table_names
-from elections.election_pr import MethodForPR
+import elections
 
 
 class PageLayout(Enum):
@@ -40,10 +39,14 @@ class PageLayout(Enum):
     SCROLLING_LAYOUT = "Scrolling Layout"
 
 
-ConfigurationOptionTypes = Union[str, PageLayout, bool, MethodForPR, int]
+ConfigurationOptionTypes = Union[str,
+                                 PageLayout,
+                                 bool,
+                                 elections.MethodForPR,
+                                 int]
 
 
-def get_enum_value(enum_name: Enum) -> str:
+def _get_enum_value(enum_name: Enum) -> str:
     """
     Get the value associated with an enum member.
 
@@ -56,7 +59,7 @@ def get_enum_value(enum_name: Enum) -> str:
     return str(enum_name.value)
 
 
-def improve_election_readability(
+def _improve_election_readability(
         election: str
 ) -> str:
     """
@@ -73,7 +76,7 @@ def improve_election_readability(
     return replacement_names.get(election, election)
 
 
-def startup() -> None:
+def _startup() -> None:
     """
     Sets everything that must be set at the start of running.
     """
@@ -89,25 +92,37 @@ def startup() -> None:
                 "https://github.com/LukeP81/Proportional-Representation",
             "About": """
             This Streamlit app allows you to explore and compare election results
-            under First-past-the-post and Proportional representation voting
+            under First-past-the-post and Proportional Representation voting
             systems. You can visualize seat plots, compare seats gained/lost, and
             analyze ruling governments based on user-configurable parameters.
-            - *Use the sidebar to select the election and set configuration
-            parameters.*\n
+            - *Use the sidebar to set configuration parameters.*\n
             Author: Luke Peart, lukepeart81@gmail.com,
              [Github](https://github.com/LukeP81)
             """
         }
     )
 
-    st.session_state["elections"] = get_table_names()
-    if "elections" not in st.session_state:
-        st.session_state["elections"] = get_table_names()
-    if "current_election" not in st.session_state:
-        st.session_state["current_election"] = st.session_state["elections"][-1]
+
+def set_election(
+        election_options: List[str]
+) -> str:
+    """
+
+    :param election_options:
+    :type election_options:
+    :return:
+    :rtype:
+    """
+    return st.selectbox(
+        label="Election",
+        options=list(reversed(election_options)),
+        format_func=_improve_election_readability,
+        key="sidebar_election_name",
+        help="Use the slider to select the election",
+    )
 
 
-def setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
+def _setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
     """
     Display and retrieve configuration options from the Streamlit sidebar.
 
@@ -115,25 +130,10 @@ def setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
     :rtype: Dict[str, Union[str, PageLayout, bool, MethodForPR, int]]
     """
 
-    def on_election_change():
-        chosen_election = st.session_state["sidebar_election_name"]
-        st.session_state["current_election"] = chosen_election
-
-    election_options = list(reversed(st.session_state["elections"]))
-    election_name = st.sidebar.selectbox(
-        label="Election",
-        options=election_options,
-        index=election_options.index(st.session_state["current_election"]),
-        format_func=improve_election_readability,
-        key="sidebar_election_name",
-        help="Use the slider to select the election",
-        on_change=on_election_change
-    )
-
     pr_method = st.sidebar.radio(
         label="PR Method",
-        options=MethodForPR,
-        format_func=get_enum_value,
+        options=elections.MethodForPR,
+        format_func=_get_enum_value,
         key="sidebar_pr_by_region",
         help="""Select how the PR will be performed by the D'Hondt method:
              \n-By Region: Utilizes individual regions for PR and sums the seats
@@ -155,7 +155,7 @@ def setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
     page_layout = st.sidebar.radio(
         label="Page Layout",
         options=PageLayout,
-        format_func=get_enum_value,
+        format_func=_get_enum_value,
         key="sidebar_page_layout",
         help="""Select how the page is displayed:
              \n-Tab Layout: the different sections are accessed through tabs
@@ -164,7 +164,6 @@ def setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
     )
 
     return {
-        "election_name": election_name,
         "pr_method": pr_method,
         "ignore_other_pr": ignore_other_pr,
         "page_layout": page_layout,
@@ -172,47 +171,7 @@ def setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
     }
 
 
-def change_current_election(election_offset: int = 0) -> None:
-    """
-    Alters the current election in the session state based on the provided
-    election offset.
-
-    :param election_offset: An integer representing the change in index to
-        navigate to different elections. Default is 0 (no alteration).
-    :type election_offset: int
-    """
-
-    elections = st.session_state["elections"]
-    current_election = st.session_state["current_election"]
-    next_election = elections[elections.index(current_election) + election_offset]
-    st.session_state["current_election"] = next_election
-
-
-def next_button():
-    """
-    Displays a button to navigate to the previous election if available.
-    """
-
-    if st.session_state["current_election"] != st.session_state["elections"][-1]:
-        st.button(label="Next Election",
-                  key="button_next_election",
-                  on_click=change_current_election,
-                  args=(+1,))
-
-
-def previous_button() -> None:
-    """
-    Displays a button to navigate to the previous election if available.
-    """
-
-    if st.session_state["current_election"] != st.session_state["elections"][0]:
-        st.button(label="Previous Election",
-                  key="button_previous_election",
-                  on_click=change_current_election,
-                  args=(-1,))
-
-
-def display_title(
+def _title(
         election_name: str
 ) -> None:
     """
@@ -222,7 +181,7 @@ def display_title(
     :type election_name: str
     """
 
-    title = f"{improve_election_readability(election_name)} Election "
+    title = f"{_improve_election_readability(election_name)} Election "
     title_html = f"""
         <p style='text-align: center;
                 font-size: 48px;
@@ -232,26 +191,20 @@ def display_title(
     st.markdown(title_html, unsafe_allow_html=True)
 
 
-def display_initial_page() -> Dict[str, ConfigurationOptionTypes]:
+def initial_page(
+        election_options: List[str]
+) -> Dict[str, ConfigurationOptionTypes]:
     """
     Display the initial components of the Streamlit page.
 
-    :return: Dictionary containing selected option from the sidebar.
+    :return: Dictionary containing selected options.
     :rtype: Dict[str, Union[str, bool, int]]
     """
 
-    startup()
-    sidebar_options = setup_sidebar_options()
+    _startup()
+    current = set_election(election_options)
+    sidebar_options = _setup_sidebar_options()
 
-    _, centre, _ = st.columns([1, 1, 1])
-    with centre:
-        with st.container():
-            left_column, right_column = centre.columns(2)
-            with left_column:
-                previous_button()
-            with right_column:
-                next_button()
+    _title(election_name=current)
 
-    display_title(election_name=sidebar_options["election_name"])
-
-    return sidebar_options
+    return {"election_name": current, **sidebar_options}

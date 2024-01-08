@@ -4,74 +4,51 @@ Streamlit App Module
 This script defines a Streamlit web application for visualizing and comparing
 election results under different voting systems.
 
-Modules:
-- `display.ruling_governments`: Functions to display comparisons of ruling
-    governments between different election systems.
-- `display.seat_comparisons`: Functions to display comparisons of seats
-    gained/lost between different election systems.
-- `display.seat_plots`: Functions to display seat plots for different election
-    systems.
-- `display.startup`: Functions for displaying the initial page and obtaining user
-    input.
-
-Classes:
-- `elections.election_fptp.FirstPastThePost`: Class for conducting
-    First-Past-The-Post (FPTP) elections.
-- `elections.election_pr.ProportionalRepresentation`: Class for conducting
-    Proportional Representation (PR) elections.
-
 Main Execution:
 1. Initializes the Streamlit app with the required modules.
 2. Obtains user selection for election and configuration parameters.
-3. Conducts FPTP and PR elections based on parameters.
+3. Conducts FPTP and PR elections based on selection.
 4. Displays election results and comparisons using Streamlit components.
 
 Usage:
 Run the script using the Streamlit command: `streamlit run streamlit_app.py`
 """
 
-import streamlit as st
+import display
+import elections
+import election_data
 
-from display.ruling_governments import display_governments_comparison
-from display.seat_comparisons import display_seat_comparison
-from display.seat_plots import display_seat_plots
-from display.startup import display_initial_page, PageLayout
-from elections.election_fptp import FirstPastThePost
-from elections.election_pr import ProportionalRepresentation
+DATABASE_NAME = "elections.db"
 
-sidebar_options = display_initial_page()
+vote_data = election_data.DatabaseElectionData(DATABASE_NAME)
 
-fptp_election = FirstPastThePost(
+sidebar_options = display.initial_page(election_options=vote_data.get_elections())
+
+fptp_election = elections.fptp.FirstPastThePost(
     election_name=sidebar_options["election_name"],
+    vote_data=vote_data,
     maximum_coalition_size=sidebar_options["maximum_coalition_size"]
 )
-fptp_election.calculate_results()
-fptp_election.calculate_coalitions()
+fptp_election.calculate_all()
 
-pr_election = ProportionalRepresentation(
+pr_election = elections.pr.ProportionalRepresentation(
     election_name=sidebar_options["election_name"],
+    vote_data=vote_data,
     maximum_coalition_size=sidebar_options["maximum_coalition_size"],
     ignore_other=sidebar_options["ignore_other_pr"],
     pr_method=sidebar_options["pr_method"]
 )
-pr_election.calculate_results()
-pr_election.calculate_coalitions()
+pr_election.calculate_all()
 
-kwargs = {"system1_election": fptp_election,
-          "system2_election": pr_election}
-
-display_order = {"Seat Plot": display_seat_plots,
-                 "Seats Gained/Lost": display_seat_comparison,
-                 "Ruling Party/Coalitions": display_governments_comparison}
-
-if sidebar_options["page_layout"] == PageLayout.TAB_LAYOUT:
-    tabs = st.tabs(display_order.keys())
-    for tab, display_function in zip(tabs, display_order.values()):
-        with tab:
-            display_function(**kwargs)
-
-if sidebar_options["page_layout"] == PageLayout.SCROLLING_LAYOUT:
-    for i, display_function in enumerate(display_order.values()):
-        if i > 0:
-            st.divider()
-        display_function(**kwargs)
+comparisons = display.Comparisons(
+    system1_election=fptp_election,
+    system2_election=pr_election,
+    display_methods=[display.seat_plots,
+                     display.seat_comparison,
+                     display.governments_comparison],
+    tab_names=["Seat Plot",
+               "Seats Gained/Lost",
+               "Ruling Party/Coalitions"],
+    layout=sidebar_options["page_layout"]
+)
+comparisons.display()
