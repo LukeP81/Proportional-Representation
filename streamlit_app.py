@@ -22,21 +22,22 @@ DATABASE_NAME = "elections.db"
 
 vote_data = election_data.DatabaseElectionData(DATABASE_NAME)
 
-sidebar_options = display.initial_page(election_options=vote_data.get_elections())
+chosen_election, sidebar_options = display.initial_page(
+    election_options=vote_data.get_elections())
 
 fptp_election = elections.fptp.FirstPastThePost(
-    election_name=sidebar_options["election_name"],
+    election_name=chosen_election,
     vote_data=vote_data,
-    maximum_coalition_size=sidebar_options["maximum_coalition_size"]
+    maximum_coalition_size=sidebar_options.maximum_coalition_size,
 )
 fptp_election.calculate_all()
 
 pr_election = elections.pr.ProportionalRepresentation(
-    election_name=sidebar_options["election_name"],
+    election_name=chosen_election,
     vote_data=vote_data,
-    maximum_coalition_size=sidebar_options["maximum_coalition_size"],
-    ignore_other=sidebar_options["ignore_other_pr"],
-    pr_method=sidebar_options["pr_method"]
+    maximum_coalition_size=sidebar_options.maximum_coalition_size,
+    ignore_other=sidebar_options.ignore_other_pr,
+    pr_method=sidebar_options.pr_method
 )
 pr_election.calculate_all()
 
@@ -49,6 +50,6 @@ comparisons = display.Comparisons(
     tab_names=["Seat Plot",
                "Seats Gained/Lost",
                "Ruling Party/Coalitions"],
-    layout=sidebar_options["page_layout"]
+    layout=sidebar_options.page_layout
 )
 comparisons.display()

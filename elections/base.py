@@ -66,7 +66,7 @@ class Election(ABC):
         self.vote_data = vote_data
         self.maximum_coalition_size = maximum_coalition_size
 
-        self._results: Dict[str, int] = {}
+        self._results: Dict[str,int] = {}
         self._results_calculated = False
 
         self._coalitions: List[List[str]] = []
@@ -157,13 +157,13 @@ class Election(ABC):
         self._coalitions = coalitions
         self._coalitions_calculated = True
 
-    def _calculate_coalitions(self) -> Optional[List[List[str]]]:
+    def _calculate_coalitions(self) -> List[List[str]]:
         """
         Method to calculate valid coalitions based on election results.
 
         :return: A list of valid coalitions, represented as a list of party names.
-                 Returns None if no valid coalitions are found.
-        :rtype: Optional[List[List[str]]]
+                 Returns an empty list if no valid coalitions are found.
+        :rtype: List[List[str]]
         """
 
         total = sum(self.results.values())
@@ -179,7 +179,7 @@ class Election(ABC):
             remaining_parties=sorted_list,
             seat_target=seat_target)
 
-        return valid_coalitions if valid_coalitions else None
+        return valid_coalitions if valid_coalitions else []
 
     def _find_valid_coalitions_recursive(
             self,

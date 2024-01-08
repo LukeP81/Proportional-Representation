@@ -35,7 +35,7 @@ def _ruling_government(
         return
 
     st.write("**Viable Coalitions**")
-    if coalitions is None:
+    if not coalitions:
         st.error("No viable coalitions found.")
     for coalition_idx, coalition in enumerate(coalitions, start=1):
         party_list_items = "\n".join([f"- {party}" for party in coalition])

@@ -21,9 +21,9 @@ Enumerations:
 - PageLayout: Represents different page layout options.
 - MethodForPR: Defines different methods for Proportional Representation.
 """
-
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 import streamlit as st
 
@@ -39,11 +39,25 @@ class PageLayout(Enum):
     SCROLLING_LAYOUT = "Scrolling Layout"
 
 
-ConfigurationOptionTypes = Union[str,
-                                 PageLayout,
-                                 bool,
-                                 elections.MethodForPR,
-                                 int]
+@dataclass
+class ConfigurationOptions:
+    """
+    Data class representing configuration options for the election system.
+
+    :param pr_method: The method used for Proportional Representation (PR).
+    :type pr_method: elections.MethodForPR
+    :param ignore_other_pr: Flag indicating whether to ignore other PR options.
+    :type ignore_other_pr: bool
+    :param page_layout: The layout configuration for pages.
+    :type page_layout: page_layout.PageLayout
+    :param maximum_coalition_size: The maximum size allowed for political coalitions.
+    :type maximum_coalition_size: int
+    """
+
+    pr_method: elections.MethodForPR
+    ignore_other_pr: bool
+    page_layout: PageLayout
+    maximum_coalition_size: int
 
 
 def _get_enum_value(enum_name: Enum) -> str:
@@ -88,7 +102,7 @@ def _startup() -> None:
         menu_items={
             "Get help":
                 "https://github.com/LukeP81/Proportional-Representation",
-            "Report a Bug":
+            "Report a bug":
                 "https://github.com/LukeP81/Proportional-Representation",
             "About": """
             This Streamlit app allows you to explore and compare election results
@@ -107,22 +121,27 @@ def set_election(
         election_options: List[str]
 ) -> str:
     """
+    Set the election using a Streamlit select box.
 
-    :param election_options:
-    :type election_options:
-    :return:
-    :rtype:
+    :param election_options: A list of election options to be displayed in the select box.
+    :type election_options: List[str]
+
+    :return: The selected election.
+    :rtype: str
     """
-    return st.selectbox(
+
+    selected_election = st.selectbox(
         label="Election",
         options=list(reversed(election_options)),
         format_func=_improve_election_readability,
         key="sidebar_election_name",
         help="Use the slider to select the election",
     )
+    return selected_election if selected_election is not None else \
+        election_options[-1]
 
 
-def _setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
+def _setup_sidebar_options() -> ConfigurationOptions:
     """
     Display and retrieve configuration options from the Streamlit sidebar.
 
@@ -139,19 +158,23 @@ def _setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
              \n-By Region: Utilizes individual regions for PR and sums the seats
              \n-Entire Electorate: Performs PR directly on the total votes"""
     )
+    if pr_method is None:
+        pr_method = elections.MethodForPR.BY_REGION
 
     ignore_other_pr = st.sidebar.toggle(
         label="Ignore Other in PR", value=True,
         key="sidebar_pr_ignore_other",
         help="Exclude votes classified as 'Other' from the PR calculation"
     )
-    maximum_coalition_size = st.sidebar.number_input(
+
+    maximum_coalition_size = int(st.sidebar.number_input(
         label="Maximum Coalition Size",
         min_value=2,
         value=3,
         key="sidebar_maximum_coalition_size",
         help="The maximum number of parties allowed in a coalition"
-    )
+    ))
+
     page_layout = st.sidebar.radio(
         label="Page Layout",
         options=PageLayout,
@@ -162,13 +185,15 @@ def _setup_sidebar_options() -> Dict[str, ConfigurationOptionTypes]:
              \n-Scrolling Layout: the different sections are accessed through
                  scrolling"""
     )
+    if page_layout is None:
+        page_layout = PageLayout.TAB_LAYOUT
 
-    return {
-        "pr_method": pr_method,
-        "ignore_other_pr": ignore_other_pr,
-        "page_layout": page_layout,
-        "maximum_coalition_size": maximum_coalition_size
-    }
+    return ConfigurationOptions(
+        pr_method=pr_method,
+        ignore_other_pr=ignore_other_pr,
+        page_layout=page_layout,
+        maximum_coalition_size=maximum_coalition_size
+    )
 
 
 def _title(
@@ -193,7 +218,7 @@ def _title(
 
 def initial_page(
         election_options: List[str]
-) -> Dict[str, ConfigurationOptionTypes]:
+) -> Tuple[str, ConfigurationOptions]:
     """
     Display the initial components of the Streamlit page.
 
@@ -207,4 +232,4 @@ def initial_page(
 
     _title(election_name=current)
 
-    return {"election_name": current, **sidebar_options}
+    return current, sidebar_options

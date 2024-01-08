@@ -19,7 +19,7 @@ The module includes the following functions:
 from typing import List, Tuple
 import json
 
-from plotly import graph_objects as go
+from plotly import graph_objects as go # type: ignore
 import numpy as np
 import streamlit as st
 
