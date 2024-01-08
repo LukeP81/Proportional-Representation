@@ -51,7 +51,8 @@ class ConfigurationOptions:
     :type ignore_other_pr: bool
     :param page_layout: The layout configuration for pages.
     :type page_layout: page_layout.PageLayout
-    :param maximum_coalition_size: The maximum size allowed for political coalitions.
+    :param maximum_coalition_size: The maximum size allowed for political
+           coalitions.
     :type maximum_coalition_size: int
     """
 
@@ -124,7 +125,8 @@ def set_election(
     """
     Set the election using a Streamlit select box.
 
-    :param election_options: A list of election options to be displayed in the select box.
+    :param election_options: A list of election options to be displayed in the
+                             select box.
     :type election_options: List[str]
 
     :return: The selected election.

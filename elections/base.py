@@ -66,7 +66,7 @@ class Election(ABC):
         self.vote_data = vote_data
         self.maximum_coalition_size = maximum_coalition_size
 
-        self._results: Dict[str,int] = {}
+        self._results: Dict[str, int] = {}
         self._results_calculated = False
 
         self._coalitions: List[List[str]] = []
