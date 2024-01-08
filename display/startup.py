@@ -23,7 +23,7 @@ Enumerations:
 """
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Tuple, Union
+from typing import List, Tuple
 
 import streamlit as st
 
@@ -145,8 +145,8 @@ def _setup_sidebar_options() -> ConfigurationOptions:
     """
     Display and retrieve configuration options from the Streamlit sidebar.
 
-    :return: Dict of selected options.
-    :rtype: Dict[str, Union[str, PageLayout, bool, MethodForPR, int]]
+    :return: Selected options.
+    :rtype: ConfigurationOptions
     """
 
     pr_method = st.sidebar.radio(
@@ -222,8 +222,8 @@ def initial_page(
     """
     Display the initial components of the Streamlit page.
 
-    :return: Dictionary containing selected options.
-    :rtype: Dict[str, Union[str, bool, int]]
+    :return: the chosen election and configuration options.
+    :rtype: Tuple[str, ConfigurationOptions]
     """
 
     _startup()

@@ -14,7 +14,6 @@ The file includes the following functions:
   Excel file.
 """
 
-from typing import Union
 import sqlite3
 
 from tqdm import tqdm
@@ -61,7 +60,7 @@ def process_election_data(
 
 
 def valid_sheet(
-        sheet_name: Union[int, str]
+        sheet_name: int | str
 ) -> bool:
     """
     Check if a given sheet name is valid based on specific criteria.
