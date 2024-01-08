@@ -21,6 +21,7 @@ Functions:
 
 import functools
 import inspect
+from typing import Callable
 
 
 class NotDecoratedError(BaseException):
@@ -35,14 +36,14 @@ class ParameterError(BaseException):
     """
 
 
-def comparison_method(func: callable) -> callable:
+def comparison_method(func: Callable) -> Callable:
     """
     Decorator for marking functions as comparison methods.
 
     :param func: The function to be decorated.
-    :type func: callable
+    :type func: Callable
     :return: The decorated function.
-    :rtype: callable
+    :rtype: Callable
     :raises ParameterError: If the decorated function does not have the
             expected parameters.
     """
@@ -66,12 +67,12 @@ def comparison_method(func: callable) -> callable:
     return wrapper
 
 
-def check_comparison_method(display_method:callable)->None:
+def check_comparison_method(display_method: Callable) -> None:
     """
     Checks if a function has been decorated.
 
     :param display_method: The function to be checked.
-    :type display_method: callable
+    :type display_method: Callable
     :raises NotDecoratedError: If the function is not decorated.
     """
 

@@ -5,7 +5,7 @@ This module defines the Comparisons class, which facilitates the display of
 election comparisons.
 """
 
-from typing import List
+from typing import Callable, List
 
 import streamlit as st
 
@@ -20,7 +20,7 @@ class Comparisons:
 
     Attributes:
     - kwargs (dict): Dictionary containing election objects for the two systems.
-    - display_methods (List[callable]): Functions for displaying comparisons.
+    - display_methods (List[Callable]): Functions for displaying comparisons.
     - tab_names (List[str]): List of names for tabs in the layout.
     - layout (PageLayout): Enumeration indicating the desired layout type.
 
@@ -33,7 +33,7 @@ class Comparisons:
     def __init__(self,
                  system1_election: elections.Election,
                  system2_election: elections.Election,
-                 display_methods: List[callable],
+                 display_methods: List[Callable],
                  tab_names: List[str],
                  layout: PageLayout = PageLayout.TAB_LAYOUT,
                  ):
@@ -43,7 +43,7 @@ class Comparisons:
         :param system2_election: The election object for the second system.
         :type system2_election: elections.Election
         :param display_methods: Functions for displaying comparisons.
-        :type display_methods: List[callable]
+        :type display_methods: List[Callable]
         :param tab_names: List of names for tabs in the layout.
         :type tab_names: List[str]
         :param layout: PageLayout enumeration indicating the desired layout type.
