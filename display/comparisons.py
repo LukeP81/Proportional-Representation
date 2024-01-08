@@ -4,13 +4,14 @@ Comparisons Module
 This module defines the Comparisons class, which facilitates the display of
 election comparisons.
 """
-
+from enum import Enum
 from typing import List
 
-import elections
-from display.parameter_requirements import NotDecoratedError
-from display.startup import PageLayout
 import streamlit as st
+
+import elections
+from display.parameter_requirements import check_comparison_method
+from display.startup import PageLayout
 
 
 class Comparisons:
@@ -50,10 +51,7 @@ class Comparisons:
         """
 
         for display_method in display_methods:
-            if not (getattr(display_method, 'comparison_method', False)):
-                raise NotDecoratedError(
-                    f"Function {display_method.__name__} "
-                    f"must be decorated with @comparison_method")
+            check_comparison_method(display_method)
 
         if len(tab_names) != len(display_methods):
             raise ValueError(

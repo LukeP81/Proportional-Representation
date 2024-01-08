@@ -91,8 +91,6 @@ def create_database(
     :type excel_file_path: str
     :param database_name: The name of the SQLite database to be created
     :type database_name: str
-    :return: None
-    :rtype: None
     """
 
     xls = pd.ExcelFile(path_or_buffer=excel_file_path)

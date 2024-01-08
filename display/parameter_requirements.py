@@ -12,11 +12,11 @@ Classes:
 
 Functions:
 - comparison_method: Decorator for marking functions as comparison methods.
-
-Usage:
-@comparison_method
-def my_comparison_function(system1_election, system2_election):
-    ...
+    Usage:
+    @comparison_method
+    def my_comparison_function(system1_election, system2_election):
+        ...
+- check_comparison_method: checks if a function has been decorated.
 """
 
 import functools
@@ -64,3 +64,10 @@ def comparison_method(func: callable) -> callable:
     setattr(wrapper, 'comparison_method', True)
 
     return wrapper
+
+
+def check_comparison_method(display_method):
+    if not getattr(display_method, 'comparison_method', False):
+        raise NotDecoratedError(
+            f"Function {display_method.__name__} "
+            f"must be decorated with @comparison_method")
