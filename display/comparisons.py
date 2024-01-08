@@ -4,7 +4,7 @@ Comparisons Module
 This module defines the Comparisons class, which facilitates the display of
 election comparisons.
 """
-from enum import Enum
+
 from typing import List
 
 import streamlit as st

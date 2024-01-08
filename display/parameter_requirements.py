@@ -66,7 +66,15 @@ def comparison_method(func: callable) -> callable:
     return wrapper
 
 
-def check_comparison_method(display_method):
+def check_comparison_method(display_method:callable)->None:
+    """
+    Checks if a function has been decorated.
+
+    :param display_method: The function to be checked.
+    :type display_method: callable
+    :raises NotDecoratedError: If the function is not decorated.
+    """
+
     if not getattr(display_method, 'comparison_method', False):
         raise NotDecoratedError(
             f"Function {display_method.__name__} "
