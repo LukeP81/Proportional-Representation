@@ -21,6 +21,7 @@ Enumerations:
 - PageLayout: Represents different page layout options.
 - MethodForPR: Defines different methods for Proportional Representation.
 """
+
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Tuple
