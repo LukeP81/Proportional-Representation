@@ -61,7 +61,7 @@ class ElectionData(ABC):
         :param region: Name of the country/region. If None,
                        retrieves data for all regions.
         :type region: Optional[str]
-        :param ignore_other: Whether to ignore the votes from "other" candidates.
+        :param ignore_other: Whether to ignore the votes from "other" party.
         :type ignore_other: bool
         :return: Tuple containing party names and a NumPy array of vote data.
         :rtype: Tuple[List[str], np.ndarray]

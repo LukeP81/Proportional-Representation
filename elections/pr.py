@@ -21,7 +21,7 @@ import heapq
 
 import numpy as np
 
-from elections.base import Election
+from elections.election_base import Election
 import election_data
 
 

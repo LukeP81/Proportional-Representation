@@ -11,7 +11,7 @@ import sqlite3
 
 import numpy as np
 
-from election_data.base import ElectionData
+from election_data.election_data_base import ElectionData
 
 
 class DatabaseElectionData(ElectionData):
@@ -29,12 +29,15 @@ class DatabaseElectionData(ElectionData):
     - get_vote_data: Gets vote data for a specific election.
     """
 
-    def __init__(self, database_path):
+    def __init__(
+            self,
+            database_path: str
+    ):
+        """
+        :param database_path: Path to the SQLite database file.
+        :type database_path: str
         """
 
-        :param database_path:
-        :type database_path:
-        """
         self.database_path = database_path
 
     @contextmanager
@@ -93,20 +96,42 @@ class DatabaseElectionData(ElectionData):
             ignore_other: bool = False
     ) -> Tuple[List[str], np.ndarray]:
 
-        columns_query = f"PRAGMA table_info(\"{election_name}\");"
-        columns = [f"\"{column[1]}\""
-                   for column in self._execute_query(columns_query)
-                   if column[1].startswith("Votes-")]
-        if ignore_other:
-            columns.remove("\"Votes-Other\"")
-        columns_str = ", ".join(columns)
+        party_columns = self._get_party_columns(election_name, ignore_other)
 
-        query = f"SELECT {columns_str} FROM \"{election_name}\";"
+        query = f"SELECT {", ".join(party_columns)} FROM \"{election_name}\";"
         if region is not None:
             query = f"{query[:-1]} WHERE \"Country/Region\" = \"{region}\";"
+
         result = self._execute_query(query)
-        parties = [name[7:-1].strip() for name in columns]
+        if not result:
+            party_columns=[]
+
+        party_names = [name[7:-1].strip() for name in party_columns]
         votes = np.array(result, dtype=np.float64)
         votes = np.nan_to_num(votes, nan=0)
 
-        return parties, votes
+        return party_names, votes
+
+    def _get_party_columns(
+            self,
+            election_name: str,
+            ignore_other: bool
+    ) -> List[str]:
+        """
+        Retrieve the party columns for a specific election.
+
+        :param election_name: The name of the election.
+        :type election_name: str
+        :param ignore_other: Whether to ignore the votes from "other" party.
+        :type ignore_other: bool
+        :return: A list of column names representing parties.
+        :rtype: List[str]
+        """
+
+        columns_query = f"PRAGMA table_info(\"{election_name}\");"
+        party_columns = [f"\"{column[1]}\""
+                         for column in self._execute_query(columns_query)
+                         if column[1].startswith("Votes-")]
+        if ignore_other and "\"Votes-Other\"" in party_columns:
+            party_columns.remove("\"Votes-Other\"")
+        return party_columns

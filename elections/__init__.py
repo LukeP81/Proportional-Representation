@@ -8,6 +8,6 @@ Imported Classes and Enumerations:
 - MethodForPR: Enumeration for different methods of Proportional Representation.
 """
 
-from elections.base import Election
+from elections.election_base import Election
 from elections.fptp import FirstPastThePost
 from elections.pr import ProportionalRepresentation, MethodForPR
