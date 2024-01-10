@@ -1,6 +1,12 @@
 name: CodeCheck
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # Change this to your main branch name
+
+env:
+  ERRORS: false
 
 jobs:
   build:
@@ -26,28 +32,36 @@ jobs:
         pip install -r mypy_stubs.txt
 
     - name: Lint with flake8
-      id: lint-flake8
       run: |
-        flake8 . --count --show-source --statistics --max-line-length 82 || echo "::set-env name=ERRORS::true"
+        if ! flake8 . --count --show-source --statistics --max-line-length 82; then
+          echo "Linting errors were found."
+          env ERRORS=true
+        fi
 
     - name: Lint with pylint
-      id: lint-pylint
       run: |
-        pylint $(git ls-files '*.py') || echo "::set-env name=ERRORS::true"
+        if ! pylint $(git ls-files '*.py'); then
+          echo "Linting errors were found."
+          env ERRORS=true
+        fi
 
     - name: Lint with mypy
-      id: lint-mypy
       run: |
-        mypy $(git ls-files '*.py') || echo "::set-env name=ERRORS::true"
+        if ! mypy $(git ls-files '*.py'); then
+          echo "Linting errors were found."
+          env ERRORS=true
+        fi
 
     - name: Run tests
-      id: run-tests
       run: |
-        pytest || echo "::set-env name=ERRORS::true"
+        if ! pytest; then
+          echo "Test failures were found."
+          env ERRORS=true
+        fi
 
     - name: Check for errors
       run: |
-        if [ "${{ env.ERRORS }}" == "true" ]; then
+        if [ "${ERRORS}" == "true" ]; then
           echo "Errors were found in linting or tests."
           exit 1
         fi
