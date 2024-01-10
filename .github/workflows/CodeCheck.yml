@@ -6,7 +6,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v3
@@ -25,22 +26,28 @@ jobs:
         pip install -r mypy_stubs.txt
 
     - name: Lint with flake8
-      continue-on-error: true
+      id: lint-flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --show-source --statistics --max-line-length 82
+        flake8 . --count --show-source --statistics --max-line-length 82 || echo "::set-env name=ERRORS::true"
 
     - name: Lint with pylint
-      continue-on-error: true
+      id: lint-pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint $(git ls-files '*.py') || echo "::set-env name=ERRORS::true"
 
     - name: Lint with mypy
-      continue-on-error: true
+      id: lint-mypy
       run: |
-        mypy $(git ls-files '*.py')
+        mypy $(git ls-files '*.py') || echo "::set-env name=ERRORS::true"
 
     - name: Run tests
-      continue-on-error: true
+      id: run-tests
       run: |
-        pytest
+        pytest || echo "::set-env name=ERRORS::true"
+
+    - name: Check for errors
+      run: |
+        if [ "${{ env.ERRORS }}" == "true" ]; then
+          echo "Errors were found in linting or tests."
+          exit 1
+        fi
