@@ -59,6 +59,9 @@ jobs:
           echo "{environment_variable_name}={value}" >> "$GITHUB_ENV"
         fi
 
+    - name: print env
+      run: echo "$ERRORS"
+
     - name: Check for errors
       if: ${{ env.ERRORS == true }}
       run: exit 1
