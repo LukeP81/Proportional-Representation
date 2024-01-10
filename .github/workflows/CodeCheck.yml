@@ -1,9 +1,6 @@
 name: CodeCheck
 
-on:
-  push:
-    branches:
-      - main  # Change this to your main branch name
+on: [push]
 
 env:
   ERRORS: false
@@ -59,18 +56,6 @@ jobs:
           echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
 
-    - name: print env
-      run: echo "$ERRORS"
-
-    - name: Check for errors1
-      if: env.ERRORS == true
-      run: exit 1
-
     - name: Check for errors2
       if: env.ERRORS == 'true'
       run: exit 1
-
-    - name: Check for errors3
-      if: ${{ env.DAY_OF_WEEK == 'Monday' }}
-      run: exit 1
-
