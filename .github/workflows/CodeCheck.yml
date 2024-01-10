@@ -63,5 +63,5 @@ jobs:
       run: echo "$ERRORS"
 
     - name: Check for errors
-      if: ${{ env.ERRORS == true }}
+      if: env.ERRORS == true
       run: exit 1
