@@ -32,21 +32,21 @@ jobs:
       run: |
         if ! flake8 . --count --show-source --statistics --max-line-length 82; then
           echo "Linting errors were found."
-          echo "{environment_variable_name}={value}" >> "$GITHUB_ENV"
+          echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
 
     - name: Lint with pylint
       run: |
         if ! pylint $(git ls-files '*.py'); then
           echo "Linting errors were found."
-          echo "{environment_variable_name}={value}" >> "$GITHUB_ENV"
+          echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
 
     - name: Lint with mypy
       run: |
         if ! mypy $(git ls-files '*.py'); then
           echo "Linting errors were found."
-          echo "{environment_variable_name}={value}" >> "$GITHUB_ENV"
+          echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
 
     - name: Run tests
