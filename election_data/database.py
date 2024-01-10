@@ -97,14 +97,14 @@ class DatabaseElectionData(ElectionData):
     ) -> Tuple[List[str], np.ndarray]:
 
         party_columns = self._get_party_columns(election_name, ignore_other)
-
-        query = f"SELECT {", ".join(party_columns)} FROM \"{election_name}\";"
+        joined_columns = ", ".join(party_columns)
+        query = f"SELECT {joined_columns} FROM \"{election_name}\";"
         if region is not None:
             query = f"{query[:-1]} WHERE \"Country/Region\" = \"{region}\";"
 
         result = self._execute_query(query)
         if not result:
-            party_columns=[]
+            party_columns = []
 
         party_names = [name[7:-1].strip() for name in party_columns]
         votes = np.array(result, dtype=np.float64)

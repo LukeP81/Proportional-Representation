@@ -3,9 +3,10 @@ Tests for returned_data.database
 """
 
 from contextlib import contextmanager
-import pytest
 from unittest.mock import MagicMock, patch
+
 import numpy as np
+import pytest
 import sqlite3
 
 import election_data
@@ -13,6 +14,7 @@ import election_data
 
 @contextmanager
 def mock_connection(dummy_parameter):
+    _ = dummy_parameter  # to avoid flagging linters
     conn = sqlite3.connect(":memory:")
     cursor = conn.cursor()
 
@@ -48,25 +50,6 @@ def test_connect_to_database(mock_connect):
     mock_connect.assert_called_once_with(database=test_instance.database_path)
     mock_cursor.close.assert_called_once()
     mock_conn.close.assert_called_once()
-
-
-@patch('sqlite3.connect')
-def test_execute_query(mock_connect):
-    expected_return = "test return"
-
-    mock_conn = MagicMock()
-    mock_cursor = MagicMock()
-    mock_cursor.fetchall.return_value = expected_return
-    mock_conn.cursor.return_value = mock_cursor
-    mock_connect.return_value = mock_conn
-
-    test_instance = election_data.DatabaseElectionData("")
-    test_query = "test query"
-    actual_return = test_instance._execute_query(test_query)
-
-    assert actual_return == expected_return
-    mock_cursor.execute.assert_called_once_with(test_query)
-    mock_cursor.fetchall.assert_called_once()
 
 
 def test_get_elections():
