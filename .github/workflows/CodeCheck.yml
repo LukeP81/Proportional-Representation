@@ -71,10 +71,6 @@ jobs:
       run: exit 1
 
     - name: Check for errors3
-      if: env.ERRORS == "true"
-      run: exit 1
-
-    - name: Check for errors4
       if: ${{ env.DAY_OF_WEEK == 'Monday' }}
       run: exit 1
 
