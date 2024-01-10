@@ -60,8 +60,5 @@ jobs:
         fi
 
     - name: Check for errors
-      run: |
-        if [ "${ERRORS}" == "true" ]; then
-          echo "Errors were found in linting or tests."
-          exit 1
-        fi
+      if: ${{ env.$ERRORS == true }}
+      run: exit 1
