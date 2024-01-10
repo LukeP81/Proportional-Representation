@@ -11,4 +11,8 @@ import election_data
     "method",
     ["get_elections", "get_regions", "get_vote_data"])
 def test_get_elections(method):
+    """
+    Test the presence of specified methods in ElectionData abstract base class.
+    """
+
     assert hasattr(election_data.ElectionData, method)

@@ -47,6 +47,7 @@ def mock_connection(dummy_parameter):
     conn.close()
 
 
+# pylint:disable=protected-access
 @patch('sqlite3.connect')
 def test_connect_to_database(mock_connect):
     """
@@ -63,7 +64,7 @@ def test_connect_to_database(mock_connect):
     mock_connect.return_value = mock_conn
 
     test_instance = election_data.DatabaseElectionData("test_path")
-    with test_instance._connect_to_database() as cursor:  # pylint:disable=protected-access
+    with test_instance._connect_to_database() as cursor:
         assert cursor == mock_cursor
 
     mock_connect.assert_called_once_with(database=test_instance.database_path)
