@@ -56,7 +56,7 @@ jobs:
       run: |
         if ! pytest; then
           echo "Test failures were found."
-          echo "{environment_variable_name}={value}" >> "$GITHUB_ENV"
+          echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
 
     - name: print env
