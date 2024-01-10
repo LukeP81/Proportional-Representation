@@ -4,10 +4,10 @@ Tests for returned_data.database
 
 from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
+import sqlite3
 
 import numpy as np
 import pytest
-import sqlite3
 
 import election_data
 
@@ -63,7 +63,7 @@ def test_connect_to_database(mock_connect):
     mock_connect.return_value = mock_conn
 
     test_instance = election_data.DatabaseElectionData("test_path")
-    with test_instance._connect_to_database() as cursor:
+    with test_instance._connect_to_database() as cursor:  # pylint:disable=protected-access
         assert cursor == mock_cursor
 
     mock_connect.assert_called_once_with(database=test_instance.database_path)

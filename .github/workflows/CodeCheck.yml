@@ -51,7 +51,7 @@ jobs:
 
     - name: Run tests
       run: |
-        if ! pytest; then
+        if ! python -m pytest; then
           echo "Test failures were found."
           echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
