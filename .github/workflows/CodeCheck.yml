@@ -56,6 +56,6 @@ jobs:
           echo "ERRORS=true" >> "$GITHUB_ENV"
         fi
 
-    - name: Check for errors2
+    - name: Check for errors
       if: env.ERRORS == 'true'
       run: exit 1

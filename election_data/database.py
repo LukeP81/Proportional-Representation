@@ -11,7 +11,7 @@ import sqlite3
 
 import numpy as np
 
-from election_data.election_data_base import ElectionData
+from election_data.base_election_data import ElectionData
 
 
 class DatabaseElectionData(ElectionData):
