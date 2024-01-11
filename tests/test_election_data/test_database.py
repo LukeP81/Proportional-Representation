@@ -1,6 +1,7 @@
 """
 Tests for election_data.database
 """
+# pylint: skip-file
 
 from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
@@ -36,7 +37,6 @@ def mock_connection(dummy_parameter):
     conn.close()
 
 
-# pylint:disable=protected-access
 @patch('sqlite3.connect')
 def test_connect_to_database(mock_connect):
     mock_conn = MagicMock()

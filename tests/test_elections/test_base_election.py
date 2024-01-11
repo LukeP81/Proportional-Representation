@@ -1,6 +1,7 @@
 """
 Tests for elections.base_election
 """
+# pylint: skip-file
 
 from unittest.mock import patch
 
