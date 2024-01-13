@@ -2,8 +2,8 @@
 
 ## Description
 
-Streamlit Application showing the difference between First-past-the-post
-and proportional representation in UK elections.
+Streamlit Application for comparing First-past-the-post and
+proportional representation for UK elections.
 
 
 ## Usage
