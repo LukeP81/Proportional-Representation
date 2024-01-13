@@ -24,24 +24,6 @@ class FirstPastThePost(Election):
     - _calculate_results: Calculates the FPTP election results.
     """
 
-    def __init__(
-            self,
-            election_name: str,
-            data_retriever: election_data.ElectionData,
-            maximum_coalition_size: int = 3
-    ):
-        """
-        :param election_name: The name or year of the election.
-        :type election_name: str
-        :param data_retriever: The object that will handle retrieving election
-        data.
-        :type data_retriever: election_data.ElectionData
-        :param maximum_coalition_size: The max number of parties in a coalition.
-        :type maximum_coalition_size: int
-        """
-
-        super().__init__(election_name, data_retriever, maximum_coalition_size)
-
     @property
     def election_type(self) -> str:
         return "First Past The Post"
