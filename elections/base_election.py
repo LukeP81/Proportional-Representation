@@ -25,6 +25,7 @@ class Election(ABC):
 
     Attributes:
     - election_name (str): The name of the election.
+    - data_retriever: The object that will handle retrieving election data.
     - maximum_coalition_size (int): The max number of parties in a coalition.
 
     Properties:
@@ -52,18 +53,21 @@ class Election(ABC):
     def __init__(
             self,
             election_name: str,
-            vote_data: election_data.ElectionData,
+            data_retriever: election_data.ElectionData,
             maximum_coalition_size: int = 3
     ):
         """
         :param election_name: The name of the election.
         :type election_name: str
+        :param data_retriever: The object that will handle retrieving election
+        data.
+        :type data_retriever: election_data.ElectionData
         :param maximum_coalition_size: The max number of parties in a coalition.
         :type maximum_coalition_size: int
         """
 
         self.election_name = election_name
-        self.vote_data = vote_data
+        self.data_retriever = data_retriever
         self.maximum_coalition_size = maximum_coalition_size
 
         self._results: Dict[str, int] = {}

@@ -27,14 +27,14 @@ chosen_election, sidebar_options = display.initial_page(
 
 fptp_election = elections.fptp.FirstPastThePost(
     election_name=chosen_election,
-    vote_data=vote_data,
+    data_retriever=vote_data,
     maximum_coalition_size=sidebar_options.maximum_coalition_size,
 )
 fptp_election.calculate_all()
 
 pr_election = elections.pr.ProportionalRepresentation(
     election_name=chosen_election,
-    vote_data=vote_data,
+    data_retriever=vote_data,
     maximum_coalition_size=sidebar_options.maximum_coalition_size,
     ignore_other=sidebar_options.ignore_other_pr,
     pr_method=sidebar_options.pr_method

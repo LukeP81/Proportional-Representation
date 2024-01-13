@@ -21,21 +21,26 @@ class ConcreteElection(elections.Election):
 
 
 class ConcreteElectionData(election_data.ElectionData):
-
     def get_elections(self):
-        pass
+        """Blank implementation of abstract method"""
 
     def get_regions(self, election_name):
-        pass
+        """Blank implementation of abstract method"""
 
     def get_vote_data(self, election_name, region=None, ignore_other=False):
-        pass
+        """Blank implementation of abstract method"""
 
 
 @pytest.fixture()
 def test_election():
     yield ConcreteElection(election_name="test_name",
-                           vote_data=ConcreteElectionData())
+                           data_retriever=ConcreteElectionData())
+
+
+def test_election_type(test_election):
+    expected_election_type = "test_election_type"
+    actual_election_type = test_election.election_type
+    assert actual_election_type == expected_election_type
 
 
 def test_calculate_all(test_election):

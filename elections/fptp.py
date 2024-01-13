@@ -20,13 +20,6 @@ class FirstPastThePost(Election):
     """
     Class representing a First Past The Post election.
 
-    Attributes:
-    - election_name (str): The name/year of the election.
-    - maximum_coalition_size (int): The max number of parties in a coalition.
-
-    Properties:
-    - election_type (str): Property representing the type of the election.
-
     Methods:
     - _calculate_results: Calculates the FPTP election results.
     """
@@ -34,19 +27,20 @@ class FirstPastThePost(Election):
     def __init__(
             self,
             election_name: str,
-            vote_data: election_data.DatabaseElectionData,
-            maximum_coalition_size: int
+            data_retriever: election_data.ElectionData,
+            maximum_coalition_size: int = 3
     ):
         """
         :param election_name: The name or year of the election.
         :type election_name: str
-        :param vote_data:
-        :type vote_data:
+        :param data_retriever: The object that will handle retrieving election
+        data.
+        :type data_retriever: election_data.ElectionData
         :param maximum_coalition_size: The max number of parties in a coalition.
         :type maximum_coalition_size: int
         """
 
-        super().__init__(election_name, vote_data, maximum_coalition_size)
+        super().__init__(election_name, data_retriever, maximum_coalition_size)
 
     @property
     def election_type(self) -> str:
@@ -60,9 +54,12 @@ class FirstPastThePost(Election):
         :rtype: Dict[str, int]
         """
 
-        parties, votes = self.vote_data.get_vote_data(
+        parties, votes = self.data_retriever.get_vote_data(
             election_name=self.election_name)
-        max_vote_counts = votes.max(axis=1, initial=0)
-        winning_party_flags = np.array(votes == max_vote_counts[:, np.newaxis])
-        parties_seats = dict(zip(parties, winning_party_flags.sum(axis=0)))
+
+        winning_party_indices = np.argmax(votes, axis=1)
+        party_seat_counts = np.bincount(winning_party_indices,
+                                        minlength=len(parties))
+
+        parties_seats = dict(zip(parties, party_seat_counts))
         return self.sort_results(parties_seats)

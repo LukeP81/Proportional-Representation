@@ -39,13 +39,8 @@ class ProportionalRepresentation(Election):
     Class representing a Proportional Representation election.
 
     Attributes:
-    - election_name (str): The name of the election.
-    - maximum_coalition_size (int): The max number of parties in a coalition.
     - pr_method (MethodForPR.BY_REGION): Method for the PR calculation.
     - ignore_other (bool): Whether to ignore "Other" in calculations.
-
-    Properties:
-    - election_type (str): Property representing the type of the election.
 
     Methods:
     - _calculate_results: Calculates the PR election results based on the
@@ -59,14 +54,17 @@ class ProportionalRepresentation(Election):
     def __init__(
             self,
             election_name: str,
-            vote_data: election_data.DatabaseElectionData,
-            maximum_coalition_size: int,
+            data_retriever: election_data.ElectionData,
+            maximum_coalition_size: int = 3,
             pr_method: MethodForPR = MethodForPR.BY_REGION,
             ignore_other: bool = True
     ):
         """
         :param election_name: The name of the election.
         :type election_name: str
+        :param data_retriever: The object that will handle retrieving election
+        data.
+        :type data_retriever: election_data.ElectionData
         :param maximum_coalition_size: The max number of parties in a coalition.
         :type maximum_coalition_size: int
         :param pr_method: How the PR is calculated.
@@ -75,7 +73,7 @@ class ProportionalRepresentation(Election):
         :type ignore_other: bool
         """
 
-        super().__init__(election_name, vote_data, maximum_coalition_size)
+        super().__init__(election_name, data_retriever, maximum_coalition_size)
         self.pr_method = pr_method
         self.ignore_other = ignore_other
 
@@ -126,7 +124,7 @@ class ProportionalRepresentation(Election):
         :rtype: Dict[str, int]
         """
 
-        parties, votes = self.vote_data.get_vote_data(
+        parties, votes = self.data_retriever.get_vote_data(
             election_name=self.election_name,
             ignore_other=self.ignore_other)
         results = self._compute_seats_by_pr(parties=parties, votes=votes)
@@ -141,10 +139,11 @@ class ProportionalRepresentation(Election):
         :rtype: Dict[str, int]
         """
 
-        regions = self.vote_data.get_regions(election_name=self.election_name)
+        regions = self.data_retriever.get_regions(
+            election_name=self.election_name)
         region_seats = []
         for region in regions:
-            parties, votes = self.vote_data.get_vote_data(
+            parties, votes = self.data_retriever.get_vote_data(
                 election_name=self.election_name,
                 region=region,
                 ignore_other=self.ignore_other)
