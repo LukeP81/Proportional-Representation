@@ -13,7 +13,6 @@ from typing import Dict
 import numpy as np
 
 from elections.base_election import Election
-import election_data
 
 
 class FirstPastThePost(Election):
