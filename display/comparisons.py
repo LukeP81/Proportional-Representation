@@ -71,7 +71,7 @@ class Comparisons:
         if self.layout == PageLayout.TAB_LAYOUT:
             self._tab_layout()
         if self.layout == PageLayout.SCROLLING_LAYOUT:
-            self._tab_layout()
+            self._scrolling_layout()
 
     def _tab_layout(self) -> None:
         """
